@@ -1,31 +1,31 @@
-# Define the Room class.
-
 class Room:
+    """Lieu de la map, avec descriptions, sorties, objets, et PNJ."""
 
-    # Define the constructor. 
-    def __init__(self, name, description):
+    def __init__(self, name, description, exits=None, items=None, pnj=None):
         self.name = name
         self.description = description
-        self.exits = {}
-    
-    # Define the get_exit method.
+        self.exits = exits or {}      # {"nord": "rue", "est": "bde"}
+        self.items = items or []       # ["cafe", "cle_usb"]
+        self.pnj = pnj or []           # ["affiche_bug", "membre_bde"]
+
     def get_exit(self, direction):
+        """Retourne la salle accessible via direction, sinon None."""
+        return self.exits.get(direction)
 
-        # Return the room in the given direction if it exists.
-        if direction in self.exits.keys():
-            return self.exits[direction]
-        else:
-            return None
-    
-    # Return a string describing the room's exits.
     def get_exit_string(self):
-        exit_string = "Sorties: " 
-        for exit in self.exits.keys():
-            if self.exits.get(exit) is not None:
-                exit_string += exit + ", "
-        exit_string = exit_string.strip(", ")
-        return exit_string
+        """Retourne la liste des sorties sous forme de texte."""
+        if not self.exits:
+            return "Aucune sortie."
+        return "Sorties : " + ", ".join(self.exits.keys())
 
-    # Return a long description of this room including exits.
-    def get_long_description(self):
-        return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
+    def get_long_description(self, items_str="", pnj_str=""):
+        """Retourne la description complète de la pièce."""
+        base = f"Vous êtes {self.description}\n\n"
+        base += self.get_exit_string()
+        if items_str:
+            base += f"\n\nObjets visibles :\n{items_str}"
+        if pnj_str:
+            base += f"\n\nPersonnes présentes :\n{pnj_str}"
+        return base
+
+
