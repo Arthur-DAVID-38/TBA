@@ -45,6 +45,8 @@ class Game:
             "drop": Command("drop", "déposer <objet>", Actions.drop, 1),
             "talk": Command("talk", "parler <pnj>", Actions.talk, 1),
             "quit": Command("quit", "quitter le jeu", Actions.quit, 0),
+            "stats": Command("stats", "afficher statistiques du joueur", Actions.stats, 0),
+
         }
 
     def parse(self, line):
