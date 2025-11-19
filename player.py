@@ -6,31 +6,30 @@ class Player:
         self.current_room = starting_room
 
         # Inventaire
-        self.inventory = {}             # {"cafe": Item(...)}
-        self.max_weight = 8             # capacité totale
-        self.history = []               # pile des salles visitées
+        self.inventory = {}             
+        self.max_weight = 8             
+        self.history = []               
 
         # Stats ESIEE
         self.energie = 50
         self.stress = 10
         self.charisme = 5
 
-        # Progression des quêtes (barres + pourcentage)
+        # Progression des patches
         self.patch_social = 0
         self.patch_hardware = 0
         self.patch_planning = 0
 
-        # Popularité (0–100)
+        # Popularité
         self.popularite = 50
 
-    # --- Déplacements ---
+    # ---------- DEPLACEMENT ----------
     def move(self, direction, room_map):
-        """Déplacement dans la direction donnée."""
         direction = direction.lower()
         next_room_key = self.current_room.get_exit(direction)
 
         if not next_room_key:
-            return None  # déplacement impossible
+            return None  
 
         next_room = room_map[next_room_key]
         self.history.append(self.current_room)
@@ -39,18 +38,18 @@ class Player:
         self.energie -= 5
         return next_room
 
-    # --- Gestion du poids ---
+    # ---------- POIDS ----------
     def can_carry(self, item):
         current_weight = sum(it.weight for it in self.inventory.values())
         return current_weight + item.weight <= self.max_weight
 
-    # --- Barre de progression ---
+    # ---------- BARRE GRAPHIQUE ----------
     def barre(self, valeur):
         taille = 20
         filled = int((valeur / 100) * taille)
         return "[" + "#" * filled + "-" * (taille - filled) + f"] {valeur}%"
 
-    # --- Affichage global (stats + progression) ---
+    # ---------- AFFICHAGE GLOBAL ----------
     def show_progress(self):
         print("\n=== PROGRESSION ===")
         print(f"Patch Social     : {self.barre(self.patch_social)}")
