@@ -23,7 +23,7 @@ class Player:
         # Popularité (0–100)
         self.popularite = 50
 
-    # --- Déplacements ---
+        """ Déplacements """
     def move(self, direction, room_map):
         """Déplacement dans la direction donnée."""
         direction = direction.lower()
@@ -39,18 +39,18 @@ class Player:
         self.energie -= 5
         return next_room
 
-    # --- Gestion du poids ---
+        """ Gestion du poids """
     def can_carry(self, item):
         current_weight = sum(it.weight for it in self.inventory.values())
         return current_weight + item.weight <= self.max_weight
 
-    # --- Barre de progression ---
+        """ Barre de progression """
     def barre(self, valeur):
         taille = 20
         filled = int((valeur / 100) * taille)
         return "[" + "#" * filled + "-" * (taille - filled) + f"] {valeur}%"
 
-    # --- Affichage global (stats + progression) ---
+        """ Affichage global (stats + progression) """
     def show_progress(self):
         print("\n=== PROGRESSION ===")
         print(f"Patch Social     : {self.barre(self.patch_social)}")

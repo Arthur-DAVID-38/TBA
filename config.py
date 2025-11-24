@@ -5,130 +5,148 @@ from character import Character
 
 DEBUG = False
 
-# --- Définition des salles ---
 rooms_config = {
+
     "rue": {
         "name": "La Rue",
-        "description": "dans La Rue, le grand couloir de l’ESIEE, qui semble s’étendre à l’infini entre plusieurs réalités.",
+        "description": "dans le grand couloir glitché où toutes les timelines se croisent.",
         "exits": {
-            "n": "amphi_md",
-            "s": "bde",
-            "e": "salle_blanche",
-            "o": "bu"
+            "self": "self",
+            "amphi_md": "amphi_md",
+            "bde": "bde",
+            "junior": "junior",
+            "salle_blanche": "salle_blanche",
+            "salle_3142": "salle_3142",
+            "bu": "bu",
+            "assistetud": "assistetud",
+            "bureau_courivaud": "bureau_courivaud",
+            "toit": "toit"
         },
         "items": [],
-        "pnj": []
+        "pnj": ["etudiant_panique"]
+    },
+
+    "self": {
+        "name": "Self",
+        "description": "le self où un chef autonome prépare des plats instables.",
+        "exits": {
+            "rue": "rue"
+        },
+        "items": ["plateau_glitch"],
+        "pnj": ["chef_autonome"]
     },
 
     "amphi_md": {
         "name": "Amphi MD",
-        "description": "dans l’Amphi MD où un prof répète la même diapo quantum… mais avec des résultats différents.",
+        "description": "dans l'Amphi MD, un prof glitch boucle une démonstration infinie.",
         "exits": {
-            "s": "rue",
-            "e": "3142"
+            "rue": "rue"
         },
         "items": ["slide_quantique"],
         "pnj": ["prof_glitch"]
     },
 
-    "salle_blanche": {
-        "name": "Salle Blanche",
-        "description": "dans la salle blanche, baignée d’une lumière irréelle. Les machines bourdonnent comme si elles parlaient.",
-        "exits": {
-            "o": "rue",
-            "n": "b_de_courivaud"
-        },
-        "items": ["gants_antisurvol"],
-        "pnj": ["technicien_multivers"]
-    },
-
-    "3142": {
-        "name": "Salle 3142",
-        "description": "dans la salle 3142, où les étudiants de tous les univers rendent un projet différent du même sujet.",
-        "exits": {
-            "o": "amphi_md",
-            "s": "je"
-        },
-        "items": ["rapport_bugge"],
-        "pnj": ["etudiant_panique"]
-    },
-
     "bde": {
-        "name": "BDE Multivers",
-        "description": "dans le BDE, où trois versions parallèles du bureau se disputent la cafetière unique.",
+        "name": "BDE",
+        "description": "au BDE, deux versions parallèles se disputent une cafetière.",
         "exits": {
-            "n": "rue"
+            "rue": "rue"
         },
         "items": ["cafe_douteux"],
         "pnj": ["bde_alpha", "bde_omega"]
     },
 
-    "je": {
+    "junior": {
         "name": "Junior Entreprise",
-        "description": "dans la Junior Entreprise, fragmentée en 12 dimensions, chaque version réclame sa facture.",
+        "description": "à la Junior Entreprise, un consultant multidimensionnel t’observe.",
         "exits": {
-            "n": "3142",
-            "o": "assistetud"
+            "rue": "rue"
         },
-        "items": ["cle_usb_patch"],
-        "pnj": ["consultant_quantique"]
+        "items": ["cle_usb_bug"],
+        "pnj": ["consultant_multivers"]
     },
 
-    "b_de_courivaud": {
-        "name": "Bureau de Courivaud",
-        "description": "devant le bureau de M. Courivaud, verrouillé par un paradoxe pédagogique.",
+    "salle_blanche": {
+        "name": "Salle Blanche",
+        "description": "la salle blanche où les composants semblent vivants.",
         "exits": {
-            "s": "salle_blanche",
-            "e": "self"
+            "rue": "rue"
+        },
+        "items": ["gants_antisurvol"],
+        "pnj": ["carte_vivante"]
+    },
+
+    "salle_3142": {
+        "name": "Salle 3142",
+        "description": "salle instable, parfois décalée d'une timeline.",
+        "exits": {
+            "rue": "rue"
+        },
+        "items": ["rapport_bugge"],
+        "pnj": ["ton_double"]
+    },
+
+    "bu": {
+        "name": "BU",
+        "description": "à la BU, les livres changent de contenu d'une timeline à l'autre.",
+        "exits": {
+            "rue": "rue"
+        },
+        "items": ["livre_timeline"],
+        "pnj": ["bibliothecaire_quantique"]
+    },
+
+    "assistetud": {
+        "name": "AssistEtud",
+        "description": "le bureau où les formulaires apparaissent et disparaissent.",
+        "exits": {
+            "rue": "rue"
+        },
+        "items": ["formulaire_a38"],
+        "pnj": ["agent_multivers"]
+    },
+
+    "bureau_courivaud": {
+        "name": "Bureau de Courivaud",
+        "description": "le cœur logique de l'ESIEE multivers.",
+        "exits": {
+            "rue": "rue",
+            "toit": "toit"
         },
         "items": [],
         "pnj": ["courivaud_illusoire"]
     },
 
-    "bu": {
-        "name": "BU",
-        "description": "à la BU, où les livres lévitent selon leur taux de retard.",
+    "toit": {
+        "name": "Toit",
+        "description": "le toit de l'ESIEE, face au Super-Planning quantique.",
         "exits": {
-            "e": "rue"
+            "bureau_courivaud": "bureau_courivaud"
         },
-        "items": ["manuel_vivant"],
-        "pnj": ["bibliothecaire_spectral"]
-    },
-
-    "assistetud": {
-        "name": "AssistEtud",
-        "description": "dans le bureau AssistEtud, où un formulaire A38 flotte dans un vortex administratif.",
-        "exits": {
-            "e": "je"
-        },
-        "items": ["formulaire_A38"],
-        "pnj": ["agent_multivers"]
-    },
-
-    "self": {
-        "name": "Self",
-        "description": "au self, où les plateaux se déplacent seuls comme des robots vaguement conscients.",
-        "exits": {
-            "o": "b_de_courivaud"
-        },
-        "items": ["sandwich_glitch"],
-        "pnj": ["chef_autonome"]
+        "items": [],
+        "pnj": ["super_planning"]
     }
 }
 
-# --- ITEMS ESIEE ---
+
+
+
+    """ OBJETS """
 items_config = {
     "cafe_douteux": Item("café douteux", "Un café qui transcende l’espace-temps. +10 énergie, +2 stress.", 1),
     "cle_usb_patch": Item("clé USB patchée", "Une clé indispensable pour recoder le Super-Planning.", 1),
+    "cle_usb_bug": Item("clé USB bugée", "Une clé USB récupérée sur une timeline instable.", 1),
     "slide_quantique": Item("slide quantique", "Une diapo qui change à chaque lecture.", 1),
     "gants_antisurvol": Item("gants antisurvol", "Empêchent les objets de léviter quand ils ne devraient pas.", 1),
     "rapport_bugge": Item("rapport buggé", "Il est marqué 'version finale V1.0.4b PROJET DEFINITIF', barré 8 fois.", 1),
+    "plateau_glitch": Item("plateau glitch", "Un plateau de self qui ne tient pas la même forme partout.", 1),
     "manuel_vivant": Item("manuel vivant", "Le livre respire. Littéralement.", 2),
-    "formulaire_A38": Item("formulaire A38", "Un document maudit issu du chaos administratif.", 0),
+    "formulaire_a38": Item("formulaire A38", "Un document maudit issu du chaos administratif.", 0),
+    "livre_timeline": Item("livre des timelines", "Un livre qui contient plusieurs versions d'un même chapitre.", 1),
     "sandwich_glitch": Item("sandwich glitch", "Il change de goût selon l'univers.", 1),
 }
 
-# --- PNJ ---
+    """ PNJ """
 pnj_config = {
     "prof_glitch": Character("Prof Glitch", "prof de physique quantique en boucle temporelle.",
                              ["'Revenons… DHJIWOEFJ… comme je disais…'", "La fonction d’onde… s’effondre…", "Erreur 404 dans la démonstration…"]),
@@ -142,10 +160,20 @@ pnj_config = {
                            ["'Jamais ! Notre soirée en dépend !'"]),
     "consultant_quantique": Character("Consultant Quantique", "facture tout, même les instabilités dimensionnelles.",
                                       ["'Je peux normaliser votre réalité… pour 599€ HT.'"]),
+    "consultant_multivers": Character("Consultant Multivers", "consultant multidimensionnel qui facture même les instabilités.",
+                                      ["'Je peux normaliser votre réalité… pour 599€ HT.'"]),
     "courivaud_illusoire": Character("Courivaud Illusoire", "projection pédagogique fluctuante.",
                                      ["'Est-ce que tu as PENSÉ à lire l'énoncé… dans toutes les réalités parallèles ?'"]),
     "bibliothecaire_spectral": Character("Bibliothécaire Spectral", "gardienne des livres conscients.",
                                          ["'Silence. Les livres dorment.'"]),
+    "bibliothecaire_quantique": Character("Bibliothécaire Quantique", "gardienne des livres conscients et instables.",
+                                          ["'Les chapitres migrent, faites attention.'"]),
+    "carte_vivante": Character("Carte Vivante", "une carte qui prend vie et se promène.",
+                                 ["'Je connais un raccourci… ou pas.'"]),
+    "ton_double": Character("Ton Double", "un double de toi-même, légèrement en colère.",
+                              ["'Pourquoi as-tu pris mon siège ?'"]),
+    "super_planning": Character("Super Planning", "entité omnisciente du planning.",
+                                  ["'Toutes les plages horaires sont relatives.'"]),
     "agent_multivers": Character("Agent AssistEtud", "maître absolu des formulaires.",
                                  ["'Il manque le justificatif *inter-univers*.'"]),
     "chef_autonome": Character("Chef Autonome", "robot cuisinier libre depuis le 12e big bang.",

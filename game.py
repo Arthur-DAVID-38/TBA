@@ -21,7 +21,7 @@ class Game:
         self.setup_commands()
 
     def setup_rooms(self):
-        """Instancie chaque salle à partir de config.py."""
+        """Instancie chaque salle à partir de config.py"""
         for key, data in rooms_config.items():
             self.rooms[key] = Room(
                 data["name"],

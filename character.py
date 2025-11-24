@@ -1,5 +1,4 @@
 class Character:
-    """Personnage non joueur (PNJ)"""
 
     def __init__(self, name, description, messages):
         self.name = name

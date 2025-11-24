@@ -1,5 +1,5 @@
 class Item:
-    """Objet du jeu."""
+    """Objet du jeu"""
 
     def __init__(self, name, description, weight):
         self.name = name
