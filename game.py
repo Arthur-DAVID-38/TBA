@@ -26,9 +26,11 @@ class Game:
             self.rooms[key] = Room(
                 data["name"],
                 data["description"],
-                data["exits"],
-                data["items"],
-                data["pnj"]
+                data.get("exits", {}),
+                data.get("items", []),
+                data.get("pnj", []),
+                locked=data.get("locked", False),
+                key_name=data.get("key_name")
             )
 
     def setup_player(self):
@@ -39,13 +41,17 @@ class Game:
     def setup_commands(self):
         self.commands = {
             "help": Command("help", "afficher l'aide", Actions.help, 0),
-            "regarder": Command("regarder", "décrire la salle", Actions.look, 0),
+            "look": Command("look", "décrire la salle", Actions.look, 0),
             "go": Command("go", "aller <direction>", Actions.go, 1),
             "take": Command("take", "prendre <objet>", Actions.take, 1),
             "drop": Command("drop", "déposer <objet>", Actions.drop, 1),
             "talk": Command("talk", "parler <pnj>", Actions.talk, 1),
             "quit": Command("quit", "quitter le jeu", Actions.quit, 0),
             "stats": Command("stats", "afficher statistiques du joueur", Actions.stats, 0),
+            "hist": Command("hist", "afficher historique des déplacements", Actions.hist, 0),
+            "back": Command("back", "Retourner en arrière", Actions.back, 0),
+            "assemble": Command("assemble", "assembler la machine (dans la salle blanche)", Actions.assemble, 0),
+            "inv": Command("inventory", "afficher l'inventaire", Actions.inventory, 0),
 
         }
 
@@ -64,7 +70,7 @@ class Game:
                 return None, []
             return cmd, params
 
-        print("Commande inconnue.")
+        print("Commande inconnue. Faites 'help' pour la liste des commandes.")
         return None, []
 
     def main_loop(self):
@@ -82,5 +88,3 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.main_loop()
-
-

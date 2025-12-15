@@ -15,13 +15,34 @@ class Player:
         self.stress = 10
         self.charisme = 5
 
+        self.log = [] #modif berko
+
         # Progression des quêtes (barres + pourcentage)
         self.patch_social = 0
         self.patch_hardware = 0
         self.patch_planning = 0
 
+        # Quêtes et flags (suivi d'état simple)
+        # ex: self.quests['bde_conflict'] = 'completed'
+        self.quests = {}
+        # suivi des PNJ auxquels on a parlé (utile pour résoudre des conflits)
+        self.talked_to = set()
+
         # Popularité (0–100)
         self.popularite = 50
+
+    def get_inventory_string(self):
+        """Retourne l'inventaire sous forme de texte."""
+        if not self.inventory:
+            return "Votre inventaire est vide."
+        lines = []
+        total_weight = 0
+        for item in self.inventory.values():
+            lines.append(f"- {item.name} : {item.description} (poids: {item.weight})")
+            total_weight += item.weight
+        lines.append(f"\nPoids total : {total_weight}/{self.max_weight}")
+        return "\n".join(lines)
+
 
         """ Déplacements """
     def move(self, direction, room_map):
@@ -33,6 +54,19 @@ class Player:
             return None  # déplacement impossible
 
         next_room = room_map[next_room_key]
+
+        # Vérifier si la salle cible est verrouillée
+        if getattr(next_room, 'locked', False):
+            key_needed = getattr(next_room, 'key_name', None)
+            if not key_needed or key_needed not in self.inventory:
+                print("La porte est verrouillée. Il faut une clé pour y entrer.")
+                return None
+            # On a la clé : on l'utilise pour ouvrir la porte (consommée)
+            print("Vous utilisez la clé pour ouvrir la porte. Elle s'enfonce dans la serrure et tourne.")
+            # consommer la clé
+            self.inventory.pop(key_needed, None)
+            # déverrouiller la salle pour la suite
+            next_room.locked = False
         self.history.append(self.current_room)
         self.current_room = next_room
 

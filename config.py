@@ -28,7 +28,7 @@ rooms_config = {
 
     "self": {
         "name": "Self",
-        "description": "le self où un chef autonome prépare des plats instables.",
+        "description": "le self où un chef prépare des plats instables.",
         "exits": {
             "rue": "rue"
         },
@@ -65,7 +65,7 @@ rooms_config = {
         "items": ["cle_usb_bug"],
         "pnj": ["consultant_multivers"]
     },
-
+    
     "salle_blanche": {
         "name": "Salle Blanche",
         "description": "la salle blanche où les composants semblent vivants.",
@@ -113,7 +113,10 @@ rooms_config = {
             "rue": "rue",
             "toit": "toit"
         },
+        # Le bureau est fermé par défaut et nécessite une clé pour entrer
         "items": [],
+        "locked": True,
+        "key_name": "cle_bureau_courivaud",
         "pnj": ["courivaud_illusoire"]
     },
 
@@ -131,7 +134,7 @@ rooms_config = {
 
 
 
-    """ OBJETS """
+# OBJETS 
 items_config = {
     "cafe_douteux": Item("café douteux", "Un café qui transcende l’espace-temps. +10 énergie, +2 stress.", 1),
     "cle_usb_patch": Item("clé USB patchée", "Une clé indispensable pour recoder le Super-Planning.", 1),
@@ -143,41 +146,45 @@ items_config = {
     "manuel_vivant": Item("manuel vivant", "Le livre respire. Littéralement.", 2),
     "formulaire_a38": Item("formulaire A38", "Un document maudit issu du chaos administratif.", 0),
     "livre_timeline": Item("livre des timelines", "Un livre qui contient plusieurs versions d'un même chapitre.", 1),
-    "sandwich_glitch": Item("sandwich glitch", "Il change de goût selon l'univers.", 1),
+    "sandwich_glitch": Item("sandwich glitch", "Il change de goût selon la personne.", 1),
+    "cle_bureau_courivaud": Item("clé du bureau de Courivaud", "Une petite clé permettant d'ouvrir le bureau de Courivaud au BDE.", 1),
+    # Pièces nécessaires pour assembler la machine quantique
+    "piece_assistetud": Item("pièce d'AssistEtud", "Une pièce étrange récupérée à AssistEtud, sûrement un composant de machine.", 1),
+    "piece_salle_3142": Item("pièce de la salle 3142", "Une pièce instable provenant de la salle 3142.", 1),
+    "piece_bde": Item("pièce du BDE", "Une pièce de précision récupérée au BDE.", 1),
+    "machine_quantique": Item("machine quantique assemblée", "Une machine basique qui répare une partie des bugs de l'ESIEE.", 3),
 }
 
-    """ PNJ """
+    #PNJ
 pnj_config = {
-    "prof_glitch": Character("Prof Glitch", "prof de physique quantique en boucle temporelle.",
+    "prof_glitch": Character("prof_glitch", "prof de physique quantique en boucle temporelle.",
                              ["'Revenons… DHJIWOEFJ… comme je disais…'", "La fonction d’onde… s’effondre…", "Erreur 404 dans la démonstration…"]),
-    "technicien_multivers": Character("Technicien Multivers", "réparateur de machines interdimensionnelles.",
+    "technicien_multivers": Character("technicien_multivers", "réparateur de machines interdimensionnelles.",
                                       ["'Touche à rien, ça pourrait exploser dans une autre réalité.'"]),
-    "etudiant_panique": Character("Étudiant Panique", "complètement dépassé.",
+    "etudiant_panique": Character("etudiant_panique", "complètement dépassé.",
                                   ["'Mon projet a été rendu dans un univers où je n’existe même pas.'"]),
-    "bde_alpha": Character("Membre BDE α", "chef du BDE dimension Alpha.",
+    "bde_alpha": Character("bde_alpha", "chef du BDE dimension Alpha.",
                            ["'La cafetière nous revient de droit !'"]),
-    "bde_omega": Character("Membre BDE Ω", "chef du BDE dimension Omega.",
+    "bde_omega": Character("bde_omega", "chef du BDE dimension Omega.",
                            ["'Jamais ! Notre soirée en dépend !'"]),
-    "consultant_quantique": Character("Consultant Quantique", "facture tout, même les instabilités dimensionnelles.",
-                                      ["'Je peux normaliser votre réalité… pour 599€ HT.'"]),
-    "consultant_multivers": Character("Consultant Multivers", "consultant multidimensionnel qui facture même les instabilités.",
-                                      ["'Je peux normaliser votre réalité… pour 599€ HT.'"]),
-    "courivaud_illusoire": Character("Courivaud Illusoire", "projection pédagogique fluctuante.",
+    "consultant_quantique": Character("consultant_quantique", "facture tout, même les instabilités dimensionnelles.",
+                                      ["'Je peux normaliser votre réalité… pour 599€.'"]),
+    "consultant_multivers": Character("consultant_multivers", "consultant multidimensionnel qui facture même les instabilités.",
+                                      ["'Je peux normaliser votre réalité… pour 599€.'"]),
+    "courivaud_illusoire": Character("courivaud_illusoire", "projection pédagogique fluctuante.",
                                      ["'Est-ce que tu as PENSÉ à lire l'énoncé… dans toutes les réalités parallèles ?'"]),
-    "bibliothecaire_spectral": Character("Bibliothécaire Spectral", "gardienne des livres conscients.",
+    "bibliothecaire_spectral": Character("bibliothecaire_spectral", "gardienne des livres conscients.",
                                          ["'Silence. Les livres dorment.'"]),
-    "bibliothecaire_quantique": Character("Bibliothécaire Quantique", "gardienne des livres conscients et instables.",
+    "bibliothecaire_quantique": Character("bibliothecaire_quantique", "gardienne des livres conscients et instables.",
                                           ["'Les chapitres migrent, faites attention.'"]),
-    "carte_vivante": Character("Carte Vivante", "une carte qui prend vie et se promène.",
+    "carte_vivante": Character("carte_vivante", "une carte qui prend vie et se promène.",
                                  ["'Je connais un raccourci… ou pas.'"]),
-    "ton_double": Character("Ton Double", "un double de toi-même, légèrement en colère.",
+    "ton_double": Character("ton_double", "un double de toi-même, légèrement en colère.",
                               ["'Pourquoi as-tu pris mon siège ?'"]),
-    "super_planning": Character("Super Planning", "entité omnisciente du planning.",
+    "super_planning": Character("super_planning", "entité omnisciente du planning.",
                                   ["'Toutes les plages horaires sont relatives.'"]),
-    "agent_multivers": Character("Agent AssistEtud", "maître absolu des formulaires.",
+    "agent_multivers": Character("agent_multivers", "maître absolu des formulaires.",
                                  ["'Il manque le justificatif *inter-univers*.'"]),
-    "chef_autonome": Character("Chef Autonome", "robot cuisinier libre depuis le 12e big bang.",
+    "chef_autonome": Character("chef_autonome", "robot cuisinier libre depuis le 12e big bang.",
                                ["'Nouvelle recette : pâtes quantiques aux fractales comestibles.'"])
 }
-
-

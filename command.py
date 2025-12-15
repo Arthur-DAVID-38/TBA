@@ -6,5 +6,3 @@ class Command:
         self.help_msg = help_msg
         self.action = action
         self.param_count = param_count
-
-

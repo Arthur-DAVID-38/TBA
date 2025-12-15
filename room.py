@@ -1,12 +1,16 @@
 class Room:
     """Lieu de la map, avec descriptions, sorties, objets, et PNJ."""
 
-    def __init__(self, name, description, exits=None, items=None, pnj=None):
+    def __init__(self, name, description, exits=None, items=None, pnj=None, locked=False, key_name=None):
         self.name = name
         self.description = description
         self.exits = exits or {}      # {"nord": "rue", "est": "bde"}
         self.items = items or []       # ["cafe", "cle_usb"]
         self.pnj = pnj or []           # ["affiche_bug", "membre_bde"]
+
+        # Verrouillage optionnel de la salle (si True, nécessite la clé 'key_name')
+        self.locked = locked
+        self.key_name = key_name
 
     def get_exit(self, direction):
         """Retourne la salle accessible via direction, sinon None."""
@@ -27,5 +31,3 @@ class Room:
         if pnj_str:
             base += f"\n\nPersonnes présentes :\n{pnj_str}"
         return base
-
-
