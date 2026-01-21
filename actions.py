@@ -221,7 +221,8 @@ class Actions:
                 and not game.player.quests.get("piece_bde_obtained")
 ):
 
-                print("Les membres du BDE semblent prêts à aider, mais veulent un défi : devinez le nombre mystère de 1 à 3.")
+                print("Les membres du BDE semblent prêts à aider,"
+                "mais veulent un défi : devinez le nombre mystère de 1 à 3.")
                 guess = input("(Entrez 1, 2 ou 3) > ").strip()
                 if guess == '2':
                     item_name = 'piece_bde'
@@ -241,8 +242,14 @@ class Actions:
             print("Patch Planning : progression ++ !")
 
         # Mini-jeu à AssistEtud pour obtenir la première pièce
-        if name == 'agent_multivers' and game.player.quests.get('courivaud_machine') == 'started' and not game.player.quests.get('piece_assistetud_obtained'):
-            print("L'agent vous propose un petit calcul pour obtenir une pièce : combien font 2 + 3 ?")
+        if (
+            name == "agent_multivers"
+            and game.player.quests.get("courivaud_machine") == "started"
+            and not game.player.quests.get("piece_assistetud_obtained")
+        ):
+
+            print("L'agent vous propose un petit calcul"
+            "pour obtenir une pièce : combien font 2 + 3 ?")
             ans = input("> ").strip()
             if ans == '5':
                 item_name = 'piece_assistetud'
@@ -258,8 +265,14 @@ class Actions:
                 print("Mauvaise réponse, l'agent ne vous remet pas la pièce.")
 
         # Mini-jeu à la Salle 3142 pour obtenir la deuxième pièce
-        if name == 'ton_double' and game.player.quests.get('courivaud_machine') == 'started' and not game.player.quests.get('piece_salle_3142_obtained'):
-            print("Ton Double exige une preuve que vous connaissez sa salle : tapez '3142' pour prouver que vous êtes dans la bonne salle.")
+        if (
+                name == "ton_double"
+                and game.player.quests.get("courivaud_machine") == "started"
+                and not game.player.quests.get("piece_salle_3142_obtained")
+            ):
+
+            print("Ton Double exige une preuve que vous connaissez sa salle :"
+            "tapez '3142' pour prouver que vous êtes dans la bonne salle.")
             ans = input("> ").strip()
             if ans == '3142':
                 item_name = 'piece_salle_3142'
@@ -269,7 +282,8 @@ class Actions:
                     print("Vous avez obtenu la pièce de la salle 3142 !")
                 else:
                     room.items.append(item_name)
-                    print("La pièce de la salle 3142 a été déposée dans la salle (inventaire plein).")
+                    print("La pièce de la salle 3142 a été déposée dans la salle"
+                    "(inventaire plein).")
                 game.player.quests['piece_salle_3142_obtained'] = True
             else:
                 print("Mauvaise réponse, Ton Double vous ignore.")
@@ -283,15 +297,23 @@ class Actions:
         # Conversation finale / instructions de Courivaud : démarrer la quête machine
         if name == 'courivaud_illusoire':
             # On ne démarre la quête que si le BDE a rendu la clé (bureau ouvert/logique déjà) :
-            if game.player.quests.get('bde_conflict') == 'completed' and not game.player.quests.get('courivaud_machine'):
+            if (
+                game.player.quests.get('bde_conflict') == 'completed'
+                and not game.player.quests.get('courivaud_machine')
+            ):
                 game.player.quests['courivaud_machine'] = 'started'
                 game.player.quests['piece_assistetud_obtained'] = False
                 game.player.quests['piece_salle_3142_obtained'] = False
                 game.player.quests['piece_bde_obtained'] = False
-                print("Courivaud : J'ai besoin que tu récupères trois pièces pour assembler une machine qui réparera partiellement nos bugs.")
-                print("Va chercher une pièce à AssistEtud, une à la Salle 3142, et une au BDE. Reviens me voir quand tu les as toutes.")
+                print("Courivaud : J'ai besoin que tu récupères "
+                "trois pièces pour assembler une machine qui réparera partiellement nos bugs.")
+                print("Va chercher une pièce à AssistEtud, une à la Salle 3142,"
+                "et une au BDE. Reviens me voir quand tu les as toutes.")
             # Si le joueur a déjà les 3 pièces
-            if game.player.quests.get('courivaud_machine') == 'started' and all(game.player.quests.get(k) for k in ['piece_assistetud_obtained','piece_salle_3142_obtained','piece_bde_obtained']):
+            if (
+                game.player.quests.get('courivaud_machine') == 'started'
+                and all(game.player.quests.get(k) for k in ['piece_assistetud_obtained','piece_salle_3142_obtained','piece_bde_obtained'])
+            ):
                 print("Courivaud : Parfait, retourne à la Salle Blanche et assemble la machine là-bas avec la commande 'assemble'.")
 
     @staticmethod
