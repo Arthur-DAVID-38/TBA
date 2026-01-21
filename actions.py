@@ -67,6 +67,7 @@ class Actions:
 
     @staticmethod
     def go(game, _cmd, _params):
+        """Déplace le joueur vers une salle adjacente."""
         direction = _params[0].lower()
 
         if DEBUG:
