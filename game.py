@@ -51,6 +51,7 @@ class Game:
         self.player = Player(name, self.rooms["rue"])
 
     def setup_commands(self):
+        """Initialise l’ensemble des commandes disponibles dans le jeu."""
         self.commands = {
             "help": Command("help", "afficher l'aide", Actions.help, 0),
             "look": Command("look", "décrire la salle", Actions.look, 0),
