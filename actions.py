@@ -9,6 +9,8 @@ class Actions:
     @staticmethod
     def help(game, cmd, params):
         """Affiche la liste des commandes disponibles."""
+        if DEBUG:
+            print("[DEBUG] Action: help")
         print("Commandes disponibles :")
         for name, command in game.commands.items():
             print(f"  {name} : {command.help_msg}")
@@ -66,6 +68,10 @@ class Actions:
     @staticmethod
     def go(game, cmd, params):
         direction = params[0].lower()
+
+        if DEBUG:
+            print(f"[DEBUG] Tentative de déplacement vers : {direction}")
+       
         new_room = game.player.move(direction, game.rooms)
 
         if not new_room:
@@ -137,6 +143,9 @@ class Actions:
         """Permet de dialoguer avec un PNJ et de déclencher des événements."""
         name = params[0]
         room = game.player.current_room
+
+        if DEBUG:
+            print(f"[DEBUG] Interaction avec PNJ : {name}")
 
         if name not in room.pnj:
             print("Impossible de lui parler ici.")
