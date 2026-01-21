@@ -197,7 +197,7 @@ class Actions:
                 # Si les deux membres sont résolus, on donne la clé
                 resolved_set = {k for k in game.player.quests.keys()
                 if k.startswith('resolved_') and game.player.quests[k] == 'ok'}
-                
+
                 if {"resolved_bde_alpha", "resolved_bde_omega"}.issubset(resolved_set) and not game.player.quests.get('bde_conflict'):
                     game.player.quests['bde_conflict'] = 'completed'
                     key_name = 'cle_bureau_courivaud'
