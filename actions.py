@@ -6,7 +6,7 @@ from config import DEBUG
 class Actions:
     """Regroupe les actions exécutables par le joueur."""
     @staticmethod
-    def help(game, cmd, params):
+    def help(game, _cmd, _params):
         """Affiche la liste des commandes disponibles."""
         if DEBUG:
             print("[DEBUG] Action: help")
@@ -15,7 +15,7 @@ class Actions:
             print(f"  {name} : {command.help_msg}")
 
     @staticmethod
-    def inventory(game, cmd, params):
+    def inventory(game, _cmd, _params):
         """Affiche le contenu de l’inventaire du joueur."""
         if not game.player.inventory:
             print("Votre inventaire est vide.")
@@ -26,7 +26,7 @@ class Actions:
             print(f"- {item}")
 
     @staticmethod
-    def back(game, cmd, params):
+    def back(game, _cmd, _params):
         if not game.player.history:
             print("Aucun déplacement précédent.")
             return
@@ -37,7 +37,7 @@ class Actions:
         Actions.look(game, None, None)
 
     @staticmethod
-    def look(game, cmd, params):
+    def look(game, _cmd, _params):
         """Affiche la description de la salle courante."""
         room = game.player.current_room
         items = room.items
@@ -65,8 +65,8 @@ class Actions:
         print(room.get_long_description(items_str, pnj_str))
 
     @staticmethod
-    def go(game, cmd, params):
-        direction = params[0].lower()
+    def go(game, _cmd, _params):
+        direction = _params[0].lower()
 
         if DEBUG:
             print(f"[DEBUG] Tentative de déplacement vers : {direction}")
@@ -82,7 +82,7 @@ class Actions:
         Actions.look(game, None, None)
 
     @staticmethod
-    def hist(game, cmd, params):
+    def hist(game, _cmd, _params):
         if not game.player.history:
             print("Aucun déplacement précédent.")
             return
@@ -93,8 +93,8 @@ class Actions:
 
 
     @staticmethod
-    def take(game, cmd, params):
-        item_name = params[0]
+    def take(game, _cmd, _params):
+        item_name = _params[0]
         room = game.player.current_room
 
         if item_name not in room.items:
@@ -120,8 +120,8 @@ class Actions:
             print("Patch Hardware : progression ++ !")
 
     @staticmethod
-    def drop(game, cmd, params):
-        item_name = params[0]
+    def drop(game, _cmd, _params):
+        item_name = _params[0]
         player = game.player
 
         if item_name not in player.inventory:
@@ -137,9 +137,9 @@ class Actions:
             player.popularite -= 5
 
     @staticmethod
-    def talk(game, cmd, params):
+    def talk(game, _cmd, _params):
         """Permet de dialoguer avec un PNJ et de déclencher des événements."""
-        name = params[0]
+        name = _params[0]
         room = game.player.current_room
 
         if DEBUG:
@@ -326,12 +326,12 @@ class Actions:
                 "et assemble la machine là-bas avec la commande 'assemble'.")
 
     @staticmethod
-    def quit(game, cmd, params):
+    def quit(game, _cmd, _params):
         print("À bientôt dans l'ESIEE...")
         game.running = False
 
     @staticmethod
-    def stats(game, cmd, params):
+    def stats(game, _cmd, _params):
         print(f"\n=== STATISTIQUES DE {game.player.name} ===")
         print(f"Énergie :  {game.player.energie}")
         print(f"Stress  :  {game.player.stress}")
@@ -340,7 +340,7 @@ class Actions:
         game.player.show_progress()
 
     @staticmethod
-    def assemble(game, cmd, params):
+    def assemble(game, _cmd, _params):
         # Assembler la machine dans la salle blanche si toutes les pièces sont présentes
         current = game.player.current_room
         if current is not game.rooms.get('salle_blanche'):
