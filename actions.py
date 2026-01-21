@@ -17,7 +17,7 @@ class Actions:
     @staticmethod
     def inventory(game, _cmd, _params):
         """Affiche le contenu de l’inventaire du joueur."""
-        if not game.player.inventory:
+        if not game.player.inventory.items:
             print("Votre inventaire est vide.")
             return
 
@@ -107,17 +107,17 @@ class Actions:
 
         item = game.items[item_name]
 
-        if not game.player.can_carry(item):
+        if not game.player.inventory.can_carry(item):
             print("Vous ne pouvez pas porter cet objet, trop lourd.")
             return
 
         room.items.remove(item_name)
-        game.player.inventory[item_name] = item
+        game.player.inventory.items[item_name] = item
 
         print(f"Vous avez pris {item_name}.")
 
         if item_name in ["cafe_douteux", "slide_quantique"]:
-            game.player.popularite -= 2
+            game.player.stats.popularite -= 2
 
         if item_name in ["gants_antisurvol", "rapport_bugge"]:
             game.player.patch_hardware = min(100, game.player.patch_hardware + 25)
@@ -129,17 +129,17 @@ class Actions:
         item_name = _params[0]
         player = game.player
 
-        if item_name not in player.inventory:
+        if item_name not in player.inventory.items:
             print("Cet objet n'est pas dans votre inventaire.")
             return
 
-        player.inventory.pop(item_name)
+        player.inventory.items.pop(item_name)
         player.current_room.items.append(item_name)
 
         print(f"Vous avez déposé {item_name}.")
 
         if item_name == "rapport_bugge":
-            player.popularite -= 5
+            player.stats.popularite -= 5
 
     @staticmethod
     def talk(game, _cmd, _params):
@@ -175,7 +175,7 @@ class Actions:
 
         # Étudiant paniqué
         elif name == "etudiant_panique":
-            game.player.popularite += 4
+            game.player.stats.popularite += 4
 
         # Prof glitch
         elif name == "prof_glitch":
@@ -192,7 +192,7 @@ class Actions:
         # Patch social et popularité comme avant
         game.player.patch_social = min(100, game.player.patch_social + 20)
         print("Patch Social : progression ++ !")
-        game.player.popularite += 3
+        game.player.stats.popularite += 3
 
         # Si le conflit n'est pas encore résolu, proposer les choix conciliateurs
         if not game.player.quests.get("bde_conflict"):
@@ -266,8 +266,8 @@ class Actions:
             key_name = "cle_bureau_courivaud"
             item = game.items.get(key_name)
 
-            if item and game.player.can_carry(item):
-                game.player.inventory[key_name] = item
+            if item and game.player.inventory.can_carry(item):
+                game.player.inventory.items[key_name] = item
                 print(
                     "Les membres du BDE se réconcilient et vous remettent une clé : "
                     "vous avez obtenu 'cle_bureau_courivaud'."
@@ -293,8 +293,8 @@ class Actions:
         if guess == "2":
             item_name = "piece_bde"
             item = game.items.get(item_name)
-            if item and game.player.can_carry(item):
-                game.player.inventory[item_name] = item
+            if item and game.player.inventory.can_carry(item):
+                game.player.inventory.items[item_name] = item
                 print("Vous avez récupéré la pièce du BDE !")
             else:
                 room.items.append(item_name)
@@ -333,8 +333,8 @@ class Actions:
             if ans == "5":
                 item_name = "piece_assistetud"
                 item = game.items.get(item_name)
-                if item and game.player.can_carry(item):
-                    game.player.inventory[item_name] = item
+                if item and game.player.inventory.can_carry(item):
+                    game.player.inventory.items[item_name] = item
                     print("Vous avez obtenu la pièce d'AssistEtud !")
                 else:
                     room.items.append(item_name)
@@ -367,8 +367,8 @@ class Actions:
             if ans == "3142":
                 item_name = "piece_salle_3142"
                 item = game.items.get(item_name)
-                if item and game.player.can_carry(item):
-                    game.player.inventory[item_name] = item
+                if item and game.player.inventory.can_carry(item):
+                    game.player.inventory.items[item_name] = item
                     print("Vous avez obtenu la pièce de la salle 3142 !")
                 else:
                     room.items.append(item_name)
@@ -442,8 +442,8 @@ class Actions:
         item = game.items.get(item_name)
         room = game.player.current_room
 
-        if item and game.player.can_carry(item):
-            game.player.inventory[item_name] = item
+        if item and game.player.inventory.can_carry(item):
+            game.player.inventory.items[item_name] = item
         else:
             room.items.append(item_name)
 
@@ -473,19 +473,19 @@ class Actions:
             return
 
         needed = ['piece_assistetud', 'piece_salle_3142', 'piece_bde']
-        missing = [p for p in needed if p not in game.player.inventory]
+        missing = [p for p in needed if p not in game.player.inventory.items]
         if missing:
             print(f"Il vous manque des pièces pour assembler la machine : {', '.join(missing)}")
             return
 
         # Consommer les pièces
         for p in needed:
-            game.player.inventory.pop(p, None)
+            game.player.inventory.items.pop(p, None)
 
         # Ajouter la machine et marquer la progression
         machine = game.items.get('machine_quantique')
         if machine:
-            game.player.inventory['machine_quantique'] = machine
+            game.player.inventory.items['machine_quantique'] = machine
         game.player.quests['machine_assembled'] = 'completed'
         game.player.patch_hardware = min(100, game.player.patch_hardware + 40)
         print("Vous avez assemblé la machine quantique !"
