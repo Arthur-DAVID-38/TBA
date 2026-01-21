@@ -8,12 +8,14 @@ class Actions:
     """Regroupe les actions exécutables par le joueur."""
     @staticmethod
     def help(game, cmd, params):
+        """Affiche la liste des commandes disponibles."""
         print("Commandes disponibles :")
         for name, command in game.commands.items():
             print(f"  {name} : {command.help_msg}")
 
     @staticmethod
     def inventory(game, cmd, params):
+        """Affiche le contenu de l’inventaire du joueur."""
         if not game.player.inventory:
             print("Votre inventaire est vide.")
             return
@@ -35,6 +37,7 @@ class Actions:
 
     @staticmethod
     def look(game, cmd, params):
+        """Affiche la description de la salle courante."""
         room = game.player.current_room
         items = room.items
         pnj = room.pnj
