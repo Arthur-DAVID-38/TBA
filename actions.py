@@ -5,6 +5,7 @@ from item import Item
 from config import DEBUG
 
 class Actions:
+    """Regroupe les actions exécutables par le joueur."""
     @staticmethod
     def help(game, cmd, params):
         print("Commandes disponibles :")
