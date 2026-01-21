@@ -1,3 +1,9 @@
+"""Moteur principal du jeu textuel TBA « Bug dans la Matrice ».
+
+Ce module initialise le jeu, charge les salles, le joueur et les commandes,
+puis gère la boucle principale d’exécution et l’interprétation des commandes
+saisies par l’utilisateur.
+"""
 # game.py — moteur principal ESIEE Bug dans la Matrice
 
 from room import Room
@@ -91,4 +97,3 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.main_loop()
-    
