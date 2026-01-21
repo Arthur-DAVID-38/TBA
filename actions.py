@@ -27,6 +27,7 @@ class Actions:
 
     @staticmethod
     def back(game, _cmd, _params):
+        """Retourne le joueur dans la salle précédente."""
         if not game.player.history:
             print("Aucun déplacement précédent.")
             return
@@ -83,6 +84,7 @@ class Actions:
 
     @staticmethod
     def hist(game, _cmd, _params):
+        """Affiche l’historique des déplacements du joueur."""
         if not game.player.history:
             print("Aucun déplacement précédent.")
             return
@@ -94,6 +96,7 @@ class Actions:
 
     @staticmethod
     def take(game, _cmd, _params):
+        """Permet au joueur de ramasser un objet."""
         item_name = _params[0]
         room = game.player.current_room
 
@@ -121,6 +124,7 @@ class Actions:
 
     @staticmethod
     def drop(game, _cmd, _params):
+        """Permet au joueur de déposer un objet."""
         item_name = _params[0]
         player = game.player
 
@@ -327,11 +331,13 @@ class Actions:
 
     @staticmethod
     def quit(game, _cmd, _params):
+        """Quitte le jeu."""
         print("À bientôt dans l'ESIEE...")
         game.running = False
 
     @staticmethod
     def stats(game, _cmd, _params):
+        """Affiche les statistiques du joueur."""
         print(f"\n=== STATISTIQUES DE {game.player.name} ===")
         print(f"Énergie :  {game.player.energie}")
         print(f"Stress  :  {game.player.stress}")
@@ -341,6 +347,7 @@ class Actions:
 
     @staticmethod
     def assemble(game, _cmd, _params):
+        """Assemble la machine finale si toutes les pièces sont réunies."""
         # Assembler la machine dans la salle blanche si toutes les pièces sont présentes
         current = game.player.current_room
         if current is not game.rooms.get('salle_blanche'):
