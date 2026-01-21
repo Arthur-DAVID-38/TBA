@@ -188,7 +188,6 @@ class Actions:
     @staticmethod
     def _talk_bde(game, name):
         """Gère les interactions avec les membres du BDE (conflit + mini-jeu)."""
-        room = game.player.current_room
 
         # Patch social et popularité comme avant
         game.player.patch_social = min(100, game.player.patch_social + 20)
