@@ -72,6 +72,10 @@ class Game:
         }
 
     def parse(self, line):
+        """Analyse la commande saisie par l’utilisateur.
+        Vérifie la validité de la commande et retourne son nom,
+        ainsi que la liste des paramètres associés.
+    """
         if not line:
             return None, []
 
