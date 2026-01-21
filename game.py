@@ -45,6 +45,7 @@ class Game:
             )
 
     def setup_player(self):
+        """Crée le joueur et l’associe à la salle de départ."""
         name = input("Entrez votre nom : ")
         print(f"Bienvenue {name} dans l'ESIEE… ou une version de l'ESIEE…")
         self.player = Player(name, self.rooms["rue"])
