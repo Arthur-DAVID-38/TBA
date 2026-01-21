@@ -311,10 +311,19 @@ class Actions:
                 "et une au BDE. Reviens me voir quand tu les as toutes.")
             # Si le joueur a déjà les 3 pièces
             if (
-                game.player.quests.get('courivaud_machine') == 'started'
-                and all(game.player.quests.get(k) for k in ['piece_assistetud_obtained','piece_salle_3142_obtained','piece_bde_obtained'])
+                game.player.quests.get("courivaud_machine") == "started"
+                and all(
+                    game.player.quests.get(k)
+                    for k in [
+                        "piece_assistetud_obtained",
+                        "piece_salle_3142_obtained",
+                        "piece_bde_obtained",
+                    ]
+                )
             ):
-                print("Courivaud : Parfait, retourne à la Salle Blanche et assemble la machine là-bas avec la commande 'assemble'.")
+
+                print("Courivaud : Parfait, retourne à la Salle Blanche"
+                "et assemble la machine là-bas avec la commande 'assemble'.")
 
     @staticmethod
     def quit(game, cmd, params):
@@ -354,4 +363,5 @@ class Actions:
             game.player.inventory['machine_quantique'] = machine
         game.player.quests['machine_assembled'] = 'completed'
         game.player.patch_hardware = min(100, game.player.patch_hardware + 40)
-        print("Vous avez assemblé la machine quantique ! Une partie des bugs de l'ESIEE est désormais réparée.")
+        print("Vous avez assemblé la machine quantique !"
+        "Une partie des bugs de l'ESIEE est désormais réparée.")
