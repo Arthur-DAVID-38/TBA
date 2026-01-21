@@ -151,7 +151,8 @@ class Actions:
         # Afficher le message du PNJ
         print(game.pnj[name].get_msg())
 
-        # Interaction spéciale avec les membres du BDE : choix de dialogue ou mini-jeu selon le contexte
+        # Interaction spéciale avec les membres du BDE :
+        # choix de dialogue ou mini-jeu selon le contexte
         if name in ["bde_alpha", "bde_omega"]:
             game.player.patch_social = min(100, game.player.patch_social + 20)
             print("Patch Social : progression ++ !")
@@ -169,7 +170,8 @@ class Actions:
                     good_answers = {"2"}
                 else:  # bde_omega
                     choices = [
-                        "1) On peut proposer un compromis : soirée partagée et alternance d'utilisation.",
+                        "1) On peut proposer un compromis :"
+                        "soirée partagée et alternance d'utilisation.",
                         "2) Nous devons absolument garder la cafetière pour notre camp.",
                         "3) Pourquoi ne pas demander à Courivaud ce qu'il en pense ?"
                     ]
@@ -193,7 +195,9 @@ class Actions:
                     print("Votre réponse ne convainc pas ce membre. Il reste méfiant.")
 
                 # Si les deux membres sont résolus, on donne la clé
-                resolved_set = {k for k in game.player.quests.keys() if k.startswith('resolved_') and game.player.quests[k] == 'ok'}
+                resolved_set = {k for k in game.player.quests.keys()
+                if k.startswith('resolved_') and game.player.quests[k] == 'ok'}
+                
                 if {"resolved_bde_alpha", "resolved_bde_omega"}.issubset(resolved_set) and not game.player.quests.get('bde_conflict'):
                     game.player.quests['bde_conflict'] = 'completed'
                     key_name = 'cle_bureau_courivaud'
