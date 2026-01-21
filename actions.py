@@ -24,7 +24,7 @@ class Actions:
 
         print("Votre inventaire contient :")
         for item_name, item in game.player.inventory.items():
-            print(f"- {item}")  
+            print(f"- {item}")
 
     @staticmethod
     def back(game, cmd, params):
@@ -71,7 +71,6 @@ class Actions:
 
         if DEBUG:
             print(f"[DEBUG] Tentative de déplacement vers : {direction}")
-       
         new_room = game.player.move(direction, game.rooms)
 
         if not new_room:
