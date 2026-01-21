@@ -134,6 +134,7 @@ class Actions:
 
     @staticmethod
     def talk(game, cmd, params):
+        """Permet de dialoguer avec un PNJ et de déclencher des événements."""
         name = params[0]
         room = game.player.current_room
 
