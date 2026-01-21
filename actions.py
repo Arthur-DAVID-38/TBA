@@ -198,19 +198,29 @@ class Actions:
                 resolved_set = {k for k in game.player.quests.keys()
                 if k.startswith('resolved_') and game.player.quests[k] == 'ok'}
 
-                if {"resolved_bde_alpha", "resolved_bde_omega"}.issubset(resolved_set) and not game.player.quests.get('bde_conflict'):
+                if {"resolved_bde_alpha", "resolved_bde_omega"}.issubset(resolved_set) \
+                and not game.player.quests.get("bde_conflict"):
+
                     game.player.quests['bde_conflict'] = 'completed'
                     key_name = 'cle_bureau_courivaud'
                     key_item = game.items.get(key_name)
                     if key_item and game.player.can_carry(key_item):
                         game.player.inventory[key_name] = key_item
-                        print("Les membres du BDE se réconcilient et vous remettent une clé : vous avez obtenu 'cle_bureau_courivaud'.")
+                        print("Les membres du BDE se réconcilient et vous remettent une clé :"
+                        "vous avez obtenu 'cle_bureau_courivaud'.")
                     else:
                         room.items.append(key_name)
-                        print("Les membres du BDE se réconcilient et déposent une clé dans la salle : 'cle_bureau_courivaud'.")
+                        print("Les membres du BDE se réconcilient"
+                        "et déposent une clé dans la salle :"
+                        "'cle_bureau_courivaud'.")
 
-            # Si la quête de Courivaud est active, proposer un mini-jeu pour obtenir la pièce du BDE
-            elif game.player.quests.get('courivaud_machine') == 'started' and not game.player.quests.get('piece_bde_obtained'):
+            # Si la quête de Courivaud est active,
+            # proposer un mini-jeu pour obtenir la pièce du BDE
+            elif (
+                game.player.quests.get("courivaud_machine") == "started"
+                and not game.player.quests.get("piece_bde_obtained")
+):
+
                 print("Les membres du BDE semblent prêts à aider, mais veulent un défi : devinez le nombre mystère de 1 à 3.")
                 guess = input("(Entrez 1, 2 ou 3) > ").strip()
                 if guess == '2':
