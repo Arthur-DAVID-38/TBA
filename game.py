@@ -94,6 +94,7 @@ class Game:
         return None, []
 
     def main_loop(self):
+        """Gère la boucle principale du jeu et l’exécution des commandes."""
         Actions.look(self, None, None)
 
         while self.running:
