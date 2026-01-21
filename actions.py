@@ -143,7 +143,7 @@ class Actions:
 
     @staticmethod
     def talk(game, _cmd, _params):
-        """Permet de dialoguer avec un PNJ et de déclencher des événements."""
+        """Dialogue avec un PNJ et déclenche les événements associés."""
         name = _params[0]
         room = game.player.current_room
 
@@ -153,182 +153,300 @@ class Actions:
         if name not in room.pnj:
             print("Impossible de lui parler ici.")
             return
+
         # Afficher le message du PNJ
         print(game.pnj[name].get_msg())
 
-        # Interaction spéciale avec les membres du BDE :
-        # choix de dialogue ou mini-jeu selon le contexte
-        if name in ["bde_alpha", "bde_omega"]:
-            game.player.patch_social = min(100, game.player.patch_social + 20)
-            print("Patch Social : progression ++ !")
-            game.player.popularite += 3
+        # BDE
+        if name in {"bde_alpha", "bde_omega"}:
+            Actions._talk_bde(game, name)
 
-            # Si le conflit n'est pas encore résolu, proposer les choix conciliateurs
-            if not game.player.quests.get('bde_conflict'):
-                # Choix de dialogue différents selon le membre
-                if name == "bde_alpha":
-                    choices = [
-                        "1) On se battra pour la cafetière jusqu'au bout !",
-                        "2) Et si vous partagiez la cafetière et organisiez une soirée commune ?",
-                        "3) C'est juste une cafetière, laissez tomber."
-                    ]
-                    good_answers = {"2"}
-                else:  # bde_omega
-                    choices = [
-                        "1) On peut proposer un compromis :"
-                        "soirée partagée et alternance d'utilisation.",
-                        "2) Nous devons absolument garder la cafetière pour notre camp.",
-                        "3) Pourquoi ne pas demander à Courivaud ce qu'il en pense ?"
-                    ]
-                    good_answers = {"1", "3"}  # plusieurs approches conciliatrices possibles
+        # Agent multivers
+        elif name == "agent_multivers":
+            Actions._talk_agent_multivers(game)
 
-                print("Choisissez une réponse :")
-                for c in choices:
-                    print(c)
+        # Ton double
+        elif name == "ton_double":
+            Actions._talk_ton_double(game)
 
-                reply = input("> ").strip()
+        # Courivaud illusoire
+        elif name == "courivaud_illusoire":
+            Actions._talk_courivaud(game)
 
-                # Marquer qu'on a parlé (indépendamment du contenu)
-                game.player.talked_to.add(name)
+        # Étudiant paniqué
+        elif name == "etudiant_panique":
+            game.player.popularite += 4
 
-                # Si la réponse est considérée comme conciliatrice, on marque ce membre comme résolu
-                resolved_key = f"resolved_{name}"
-                if reply in good_answers:
-                    game.player.quests[resolved_key] = 'ok'
-                    print("Votre réponse aide à apaiser les tensions.")
-                else:
-                    print("Votre réponse ne convainc pas ce membre. Il reste méfiant.")
+        # Prof glitch
+        elif name == "prof_glitch":
+            game.player.stress += 3
 
-                # Si les deux membres sont résolus, on donne la clé
-                resolved_set = {k for k in game.player.quests.keys()
-                if k.startswith('resolved_') and game.player.quests[k] == 'ok'}
+    # ======================
+    # BDE
+    # ======================
 
-                if {"resolved_bde_alpha", "resolved_bde_omega"}.issubset(resolved_set) \
-                and not game.player.quests.get("bde_conflict"):
+    @staticmethod
+    def _talk_bde(game, name):
+        """Gère les interactions avec les membres du BDE (conflit + mini-jeu)."""
+        room = game.player.current_room
 
-                    game.player.quests['bde_conflict'] = 'completed'
-                    key_name = 'cle_bureau_courivaud'
-                    key_item = game.items.get(key_name)
-                    if key_item and game.player.can_carry(key_item):
-                        game.player.inventory[key_name] = key_item
-                        print("Les membres du BDE se réconcilient et vous remettent une clé :"
-                        "vous avez obtenu 'cle_bureau_courivaud'.")
-                    else:
-                        room.items.append(key_name)
-                        print("Les membres du BDE se réconcilient"
-                        "et déposent une clé dans la salle :"
-                        "'cle_bureau_courivaud'.")
+        # Patch social et popularité comme avant
+        game.player.patch_social = min(100, game.player.patch_social + 20)
+        print("Patch Social : progression ++ !")
+        game.player.popularite += 3
 
-            # Si la quête de Courivaud est active,
-            # proposer un mini-jeu pour obtenir la pièce du BDE
-            elif (
-                game.player.quests.get("courivaud_machine") == "started"
-                and not game.player.quests.get("piece_bde_obtained")
-):
+        # Si le conflit n'est pas encore résolu, proposer les choix conciliateurs
+        if not game.player.quests.get("bde_conflict"):
+            choices, good_answers = Actions._bde_choices(name)
 
-                print("Les membres du BDE semblent prêts à aider,"
-                "mais veulent un défi : devinez le nombre mystère de 1 à 3.")
-                guess = input("(Entrez 1, 2 ou 3) > ").strip()
-                if guess == '2':
-                    item_name = 'piece_bde'
-                    item = game.items.get(item_name)
-                    if item and game.player.can_carry(item):
-                        game.player.inventory[item_name] = item
-                        print("Vous avez récupéré la pièce du BDE !")
-                    else:
-                        room.items.append(item_name)
-                        print("La pièce du BDE a été déposée dans la salle (inventaire plein).")
-                    game.player.quests['piece_bde_obtained'] = True
-                else:
-                    print("Mauvaise réponse, les membres du BDE gardent la pièce pour l'instant.")
+            print("Choisissez une réponse :")
+            for c in choices:
+                print(c)
 
-        if name in ["agent_multivers", "courivaud_illusoire"]:
-            game.player.patch_planning = min(100, game.player.patch_planning + 25)
-            print("Patch Planning : progression ++ !")
+            reply = input("> ").strip()
 
-        # Mini-jeu à AssistEtud pour obtenir la première pièce
+            # Marquer qu'on a parlé (indépendamment du contenu)
+            game.player.talked_to.add(name)
+
+            # Si la réponse est conciliatrice, marquer ce membre comme résolu
+            resolved_key = f"resolved_{name}"
+            if reply in good_answers:
+                game.player.quests[resolved_key] = "ok"
+                print("Votre réponse aide à apaiser les tensions.")
+            else:
+                print("Votre réponse ne convainc pas ce membre. Il reste méfiant.")
+
+            # Vérifier si les deux membres sont résolus
+            Actions._check_bde_resolution(game)
+
+        # Si la quête de Courivaud est active, proposer le mini-jeu pour la pièce
+        elif (
+            game.player.quests.get("courivaud_machine") == "started"
+            and not game.player.quests.get("piece_bde_obtained")
+        ):
+            Actions._bde_piece_minigame(game)
+
+    @staticmethod
+    def _bde_choices(name):
+        """Retourne les choix et bonnes réponses du BDE (texte identique à l'ancien code)."""
+        if name == "bde_alpha":
+            choices = [
+                "1) On se battra pour la cafetière jusqu'au bout !",
+                "2) Et si vous partagiez la cafetière et organisiez une soirée commune ?",
+                "3) C'est juste une cafetière, laissez tomber.",
+            ]
+            good_answers = {"2"}
+        else:  # bde_omega
+            choices = [
+                "1) On peut proposer un compromis :"
+                "soirée partagée et alternance d'utilisation.",
+                "2) Nous devons absolument garder la cafetière pour notre camp.",
+                "3) Pourquoi ne pas demander à Courivaud ce qu'il en pense ?",
+            ]
+            good_answers = {"1", "3"}
+
+        return choices, good_answers
+
+    @staticmethod
+    def _check_bde_resolution(game):
+        """Vérifie si les deux membres du BDE sont réconciliés et donne la clé."""
+        room = game.player.current_room
+
+        resolved_set = {
+            k
+            for k, v in game.player.quests.items()
+            if k.startswith("resolved_") and v == "ok"
+        }
+
         if (
-            name == "agent_multivers"
-            and game.player.quests.get("courivaud_machine") == "started"
+            {"resolved_bde_alpha", "resolved_bde_omega"}.issubset(resolved_set)
+            and not game.player.quests.get("bde_conflict")
+        ):
+            game.player.quests["bde_conflict"] = "completed"
+
+            key_name = "cle_bureau_courivaud"
+            item = game.items.get(key_name)
+
+            if item and game.player.can_carry(item):
+                game.player.inventory[key_name] = item
+                print(
+                    "Les membres du BDE se réconcilient et vous remettent une clé : "
+                    "vous avez obtenu 'cle_bureau_courivaud'."
+                )
+            else:
+                room.items.append(key_name)
+                print(
+                    "Les membres du BDE se réconcilient "
+                    "et déposent une clé dans la salle : "
+                    "'cle_bureau_courivaud'."
+                )
+
+    @staticmethod
+    def _bde_piece_minigame(game):
+        """Mini-jeu du BDE pour obtenir la pièce, texte identique à l'ancien code."""
+        room = game.player.current_room
+
+        print(
+            "Les membres du BDE semblent prêts à aider, "
+            "mais veulent un défi : devinez le nombre mystère de 1 à 3."
+        )
+        guess = input("(Entrez 1, 2 ou 3) > ").strip()
+        if guess == "2":
+            item_name = "piece_bde"
+            item = game.items.get(item_name)
+            if item and game.player.can_carry(item):
+                game.player.inventory[item_name] = item
+                print("Vous avez récupéré la pièce du BDE !")
+            else:
+                room.items.append(item_name)
+                print(
+                    "La pièce du BDE a été déposée dans la salle (inventaire plein)."
+                )
+            game.player.quests["piece_bde_obtained"] = True
+        else:
+            print(
+                "Mauvaise réponse, les membres du BDE gardent la pièce pour l'instant."
+            )
+
+    # ======================
+    # AGENT MULTIVERS
+    # ======================
+
+    @staticmethod
+    def _talk_agent_multivers(game):
+        """Mini-jeu AssistEtud + Patch Planning (comme ancien code)."""
+        room = game.player.current_room
+
+        # Bonus Patch Planning comme dans l'ancien code
+        game.player.patch_planning = min(100, game.player.patch_planning + 25)
+        print("Patch Planning : progression ++ !")
+
+        # Mini-jeu pour la pièce AssistEtud
+        if (
+            game.player.quests.get("courivaud_machine") == "started"
             and not game.player.quests.get("piece_assistetud_obtained")
         ):
-
-            print("L'agent vous propose un petit calcul"
-            "pour obtenir une pièce : combien font 2 + 3 ?")
+            print(
+                "L'agent vous propose un petit calcul "
+                "pour obtenir une pièce : combien font 2 + 3 ?"
+            )
             ans = input("> ").strip()
-            if ans == '5':
-                item_name = 'piece_assistetud'
+            if ans == "5":
+                item_name = "piece_assistetud"
                 item = game.items.get(item_name)
                 if item and game.player.can_carry(item):
                     game.player.inventory[item_name] = item
                     print("Vous avez obtenu la pièce d'AssistEtud !")
                 else:
                     room.items.append(item_name)
-                    print("La pièce d'AssistEtud a été déposée dans la salle (inventaire plein).")
-                game.player.quests['piece_assistetud_obtained'] = True
+                    print(
+                        "La pièce d'AssistEtud a été déposée "
+                        "dans la salle (inventaire plein)."
+                    )
+                game.player.quests["piece_assistetud_obtained"] = True
             else:
                 print("Mauvaise réponse, l'agent ne vous remet pas la pièce.")
 
-        # Mini-jeu à la Salle 3142 pour obtenir la deuxième pièce
-        if (
-                name == "ton_double"
-                and game.player.quests.get("courivaud_machine") == "started"
-                and not game.player.quests.get("piece_salle_3142_obtained")
-            ):
+    # ======================
+    # TON DOUBLE
+    # ======================
 
-            print("Ton Double exige une preuve que vous connaissez sa salle :"
-            "tapez '3142' pour prouver que vous êtes dans la bonne salle.")
+    @staticmethod
+    def _talk_ton_double(game):
+        """Mini-jeu Salle 3142 pour obtenir la pièce."""
+        room = game.player.current_room
+
+        if (
+            game.player.quests.get("courivaud_machine") == "started"
+            and not game.player.quests.get("piece_salle_3142_obtained")
+        ):
+            print(
+                "Ton Double exige une preuve que vous connaissez sa salle : "
+                "tapez '3142' pour prouver que vous êtes dans la bonne salle."
+            )
             ans = input("> ").strip()
-            if ans == '3142':
-                item_name = 'piece_salle_3142'
+            if ans == "3142":
+                item_name = "piece_salle_3142"
                 item = game.items.get(item_name)
                 if item and game.player.can_carry(item):
                     game.player.inventory[item_name] = item
                     print("Vous avez obtenu la pièce de la salle 3142 !")
                 else:
                     room.items.append(item_name)
-                    print("La pièce de la salle 3142 a été déposée dans la salle"
-                    "(inventaire plein).")
-                game.player.quests['piece_salle_3142_obtained'] = True
+                    print(
+                        "La pièce de la salle 3142 a été déposée dans la salle "
+                        "(inventaire plein)."
+                    )
+                game.player.quests["piece_salle_3142_obtained"] = True
             else:
                 print("Mauvaise réponse, Ton Double vous ignore.")
 
-        if name == "etudiant_panique":
-            game.player.popularite += 4
+    # ======================
+    # COURIVAUD
+    # ======================
 
-        if name == "prof_glitch":
-            game.player.stress += 3
+    @staticmethod
+    def _talk_courivaud(game):
+        """Déclenche et conclut la quête de la machine, avec le texte de l'ancien code."""
+        # Bonus Patch Planning comme dans l'ancien code
+        game.player.patch_planning = min(100, game.player.patch_planning + 25)
+        print("Patch Planning : progression ++ !")
 
-        # Conversation finale / instructions de Courivaud : démarrer la quête machine
-        if name == 'courivaud_illusoire':
-            # On ne démarre la quête que si le BDE a rendu la clé (bureau ouvert/logique déjà) :
-            if (
-                game.player.quests.get('bde_conflict') == 'completed'
-                and not game.player.quests.get('courivaud_machine')
-            ):
-                game.player.quests['courivaud_machine'] = 'started'
-                game.player.quests['piece_assistetud_obtained'] = False
-                game.player.quests['piece_salle_3142_obtained'] = False
-                game.player.quests['piece_bde_obtained'] = False
-                print("Courivaud : J'ai besoin que tu récupères "
-                "trois pièces pour assembler une machine qui réparera partiellement nos bugs.")
-                print("Va chercher une pièce à AssistEtud, une à la Salle 3142,"
-                "et une au BDE. Reviens me voir quand tu les as toutes.")
-            # Si le joueur a déjà les 3 pièces
-            if (
-                game.player.quests.get("courivaud_machine") == "started"
-                and all(
-                    game.player.quests.get(k)
-                    for k in [
-                        "piece_assistetud_obtained",
-                        "piece_salle_3142_obtained",
-                        "piece_bde_obtained",
-                    ]
-                )
-            ):
+        # Démarrer la quête de la machine si le BDE a rendu la clé
+        if (
+            game.player.quests.get("bde_conflict") == "completed"
+            and not game.player.quests.get("courivaud_machine")
+        ):
+            game.player.quests["courivaud_machine"] = "started"
+            game.player.quests["piece_assistetud_obtained"] = False
+            game.player.quests["piece_salle_3142_obtained"] = False
+            game.player.quests["piece_bde_obtained"] = False
 
-                print("Courivaud : Parfait, retourne à la Salle Blanche"
-                "et assemble la machine là-bas avec la commande 'assemble'.")
+            print(
+                "Courivaud : J'ai besoin que tu récupères "
+                "trois pièces pour assembler une machine qui réparera partiellement nos bugs."
+            )
+            print(
+                "Va chercher une pièce à AssistEtud, une à la Salle 3142, "
+                "et une au BDE. Reviens me voir quand tu les as toutes."
+            )
+            return
+
+        # Si le joueur a déjà les 3 pièces
+        if (
+            game.player.quests.get("courivaud_machine") == "started"
+            and all(
+                game.player.quests.get(k)
+                for k in [
+                    "piece_assistetud_obtained",
+                    "piece_salle_3142_obtained",
+                    "piece_bde_obtained",
+                ]
+            )
+        ):
+            print(
+                "Courivaud : Parfait, retourne à la Salle Blanche "
+                "et assemble la machine là-bas avec la commande 'assemble'."
+            )
+
+    # ======================
+    # (Optionnel) UTILITAIRE COMMUN
+    # ======================
+
+    @staticmethod
+    def _give_item(game, item_name):
+        """
+        Version utilitaire générique si tu veux l'utiliser ailleurs.
+        (Ici, pour mimer exactement l'ancien code, tout est déjà inline,
+        donc cette fonction est surtout là pour d'autres parties du jeu.)
+        """
+        item = game.items.get(item_name)
+        room = game.player.current_room
+
+        if item and game.player.can_carry(item):
+            game.player.inventory[item_name] = item
+        else:
+            room.items.append(item_name)
 
     @staticmethod
     def quit(game, _cmd, _params):
