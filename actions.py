@@ -1,7 +1,6 @@
-"""Définit l’ensemble des actions possibles du joueur 
+"""Définit l’ensemble des actions possibles du joueur
 dans le jeu TBA."""
 
-from item import Item
 from config import DEBUG
 
 class Actions:
@@ -266,7 +265,7 @@ class Actions:
 
         if name == "prof_glitch":
             game.player.stress += 3
-        
+
         # Conversation finale / instructions de Courivaud : démarrer la quête machine
         if name == 'courivaud_illusoire':
             # On ne démarre la quête que si le BDE a rendu la clé (bureau ouvert/logique déjà) :
