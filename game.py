@@ -50,7 +50,10 @@ class Game:
             "stats": Command("stats", "afficher statistiques du joueur", Actions.stats, 0),
             "hist": Command("hist", "afficher historique des déplacements", Actions.hist, 0),
             "back": Command("back", "Retourner en arrière", Actions.back, 0),
-            "assemble": Command("assemble", "assembler la machine (dans la salle blanche)", Actions.assemble, 0),
+            "assemble": Command(
+                "assemble",
+                "assembler la machine (dans la salle blanche)",
+                Actions.assemble, 0),
             "inv": Command("inventory", "afficher l'inventaire", Actions.inventory, 0),
 
         }
@@ -88,3 +91,4 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.main_loop()
+    
