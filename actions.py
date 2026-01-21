@@ -22,7 +22,7 @@ class Actions:
             return
 
         print("Votre inventaire contient :")
-        for item_name, item in game.player.inventory.items():
+        for _item_name, item in game.player.inventory.items():
             print(f"- {item}")
 
     @staticmethod
