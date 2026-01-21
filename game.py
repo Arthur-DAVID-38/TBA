@@ -14,6 +14,11 @@ from config import rooms_config, items_config, pnj_config, DEBUG
 from actions import Actions
 
 class Game:
+    """Classe principale du jeu.
+
+    Elle centralise l’état du jeu, le joueur, les salles,
+    les commandes et la boucle principale d’exécution.
+    """
 
     def __init__(self):
         self.running = True
