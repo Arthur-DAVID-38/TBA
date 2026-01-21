@@ -27,6 +27,9 @@ class Game:
         self.pnj = pnj_config
         self.commands = {}
 
+        if DEBUG:
+            print("[DEBUG] Initialisation du jeu")
+
         self.setup_rooms()
         self.setup_player()
         self.setup_commands()
