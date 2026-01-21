@@ -1,3 +1,6 @@
+"""Définit l’ensemble des actions possibles du joueur 
+dans le jeu TBA."""
+
 from item import Item
 from config import DEBUG
 
