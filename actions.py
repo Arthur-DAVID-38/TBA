@@ -2,6 +2,7 @@
 dans le jeu TBA."""
 
 from config import DEBUG
+from fortnite_game import play_fortnite_minigame
 
 class Actions:
     """Regroupe les actions exécutables par le joueur."""
@@ -40,9 +41,12 @@ class Actions:
     @staticmethod
     def look(game, _cmd, _params):
         """Affiche la description de la salle courante."""
+        import random
+        
         room = game.player.current_room
         items = room.items
-        pnj = room.pnj
+        pnj = list(room.pnj)  # Convertir en liste pour pouvoir la modifier
+        
         items_str = ""
         if items:
             lines = []
@@ -54,14 +58,37 @@ class Actions:
             items_str = "\n".join(lines)
 
         pnj_str = ""
+        # Ajouter les PNJs de la salle courante
         if pnj:
             lines = []
             for p in pnj:
                 if p in game.pnj:
-                    lines.append(f"- {game.pnj[p]}")
+                    # 15% de chance que le PNJ glitche à une salle adjacente
+                    glitch_chance = random.random()
+                    if glitch_chance < 0.15 and room.exits:
+                        lines.append(f"- {game.pnj[p]} (glitché dans la salle à côté?)")
+                    else:
+                        lines.append(f"- {game.pnj[p]}")
                 else:
                     lines.append(f"- (inconnu: {p})")
             pnj_str = "\n".join(lines)
+        
+        # Ajouter les PNJs glitchés des salles adjacentes
+        if room.exits:
+            glitched_pnjs = []
+            for adjacent_room_key in room.exits.values():
+                adjacent_room = game.rooms.get(adjacent_room_key)
+                if adjacent_room and adjacent_room.pnj:
+                    for p in adjacent_room.pnj:
+                        # 10% de chance qu'un PNJ adjacent glitche ici
+                        if random.random() < 0.10 and p in game.pnj:
+                            glitched_pnjs.append(f"- {game.pnj[p]} (glitché ici par erreur!)")
+            
+            if glitched_pnjs:
+                if pnj_str:
+                    pnj_str += "\n" + "\n".join(glitched_pnjs)
+                else:
+                    pnj_str = "\n".join(glitched_pnjs)
 
         print(room.get_long_description(items_str, pnj_str))
 
@@ -78,9 +105,9 @@ class Actions:
             # Player.move already printed a specific message (ex: porte verrouillée)
             return
 
-        game.player.energie -= 1
-        game.player.stress += 1
-        game.player.log.append(f"Déplacé vers {new_room.name} via {direction}")
+        game.player.stats.energie -= 1
+        game.player.stats.stress += 1
+        game.player.quests.log.append(f"Déplacé vers {new_room.name} via {direction}")
         Actions.look(game, None, None)
 
     @staticmethod
@@ -120,7 +147,7 @@ class Actions:
             game.player.stats.popularite -= 2
 
         if item_name in ["gants_antisurvol", "rapport_bugge"]:
-            game.player.patch_hardware = min(100, game.player.patch_hardware + 25)
+            game.player.quests.patch_hardware = min(100, game.player.quests.patch_hardware + 25)
             print("Patch Hardware : progression ++ !")
 
     @staticmethod
@@ -179,7 +206,12 @@ class Actions:
 
         # Prof glitch
         elif name == "prof_glitch":
-            game.player.stress += 3
+            game.player.stats.popularite += 1
+            game.player.stats.stress += 3
+
+        # Étudiant Junior
+        elif name == "etudiant_junior":
+            Actions._talk_etudiant_junior(game)
 
     # ======================
     # BDE
@@ -190,7 +222,7 @@ class Actions:
         """Gère les interactions avec les membres du BDE (conflit + mini-jeu)."""
 
         # Patch social et popularité comme avant
-        game.player.patch_social = min(100, game.player.patch_social + 20)
+        game.player.quests.patch_social = min(100, game.player.quests.patch_social + 20)
         print("Patch Social : progression ++ !")
         game.player.stats.popularite += 3
 
@@ -317,7 +349,7 @@ class Actions:
         room = game.player.current_room
 
         # Bonus Patch Planning comme dans l'ancien code
-        game.player.patch_planning = min(100, game.player.patch_planning + 25)
+        game.player.quests.patch_planning = min(100, game.player.quests.patch_planning + 25)
         print("Patch Planning : progression ++ !")
 
         # Mini-jeu pour la pièce AssistEtud
@@ -388,18 +420,52 @@ class Actions:
     def _talk_courivaud(game):
         """Déclenche et conclut la quête de la machine, avec le texte de l'ancien code."""
         # Bonus Patch Planning comme dans l'ancien code
-        game.player.patch_planning = min(100, game.player.patch_planning + 25)
+        game.player.quests.patch_planning = min(100, game.player.quests.patch_planning + 25)
         print("Patch Planning : progression ++ !")
+
+        # Machine vient d'être assemblée - nouvelle quête pour le patch Python
+        if (
+            game.player.quests.quests.get("machine_assembled") == "completed"
+            and not game.player.quests.quests.get("patch_python_quest")
+        ):
+            game.player.quests.quests["patch_python_quest"] = "started"
+            print(
+                "\n🤖 Courivaud (voix grave) : Je reviens du futur avec mauvaises nouvelles..."
+            )
+            print(
+                "Les bugs que nous avons partiellement réparés reviennent en force!"
+            )
+            print(
+                "Il y a un patch critique à déployer en Python dans le Super-Planning,"
+            )
+            print("mais... je n'ai pas tes compétences en développement.")
+            print()
+            print(
+                "Je connais un étudiant talentueux à la Junior Entreprise"
+            )
+            print(
+                "qui pourrait le faire. Va le voir et convaints-le de t'aider."
+            )
+            return
+
+        # Si la quête du patch est complétée
+        if game.player.quests.quests.get("patch_python_quest") == "completed":
+            print(
+                "\n🤖 Courivaud : Excellent travail! Le Super-Planning est normalisé!"
+            )
+            print("Tous les bugs semblent enfin disparus...")
+            game.player.quests.quests["game_completed"] = "true"
+            return
 
         # Démarrer la quête de la machine si le BDE a rendu la clé
         if (
-            game.player.quests.get("bde_conflict") == "completed"
-            and not game.player.quests.get("courivaud_machine")
+            game.player.quests.quests.get("bde_conflict") == "completed"
+            and not game.player.quests.quests.get("courivaud_machine")
         ):
-            game.player.quests["courivaud_machine"] = "started"
-            game.player.quests["piece_assistetud_obtained"] = False
-            game.player.quests["piece_salle_3142_obtained"] = False
-            game.player.quests["piece_bde_obtained"] = False
+            game.player.quests.quests["courivaud_machine"] = "started"
+            game.player.quests.quests["piece_assistetud_obtained"] = False
+            game.player.quests.quests["piece_salle_3142_obtained"] = False
+            game.player.quests.quests["piece_bde_obtained"] = False
 
             print(
                 "Courivaud : J'ai besoin que tu récupères "
@@ -413,9 +479,9 @@ class Actions:
 
         # Si le joueur a déjà les 3 pièces
         if (
-            game.player.quests.get("courivaud_machine") == "started"
+            game.player.quests.quests.get("courivaud_machine") == "started"
             and all(
-                game.player.quests.get(k)
+                game.player.quests.quests.get(k)
                 for k in [
                     "piece_assistetud_obtained",
                     "piece_salle_3142_obtained",
@@ -457,9 +523,9 @@ class Actions:
     def stats(game, _cmd, _params):
         """Affiche les statistiques du joueur."""
         print(f"\n=== STATISTIQUES DE {game.player.name} ===")
-        print(f"Énergie :  {game.player.energie}")
-        print(f"Stress  :  {game.player.stress}")
-        print(f"Charisme : {game.player.charisme}")
+        print(f"Énergie :  {game.player.stats.energie}")
+        print(f"Stress  :  {game.player.stats.stress}")
+        print(f"Charisme : {game.player.stats.charisme}")
         print()
         game.player.show_progress()
 
@@ -486,7 +552,153 @@ class Actions:
         machine = game.items.get('machine_quantique')
         if machine:
             game.player.inventory.items['machine_quantique'] = machine
-        game.player.quests['machine_assembled'] = 'completed'
-        game.player.patch_hardware = min(100, game.player.patch_hardware + 40)
+        game.player.quests.quests['machine_assembled'] = 'completed'
+        game.player.quests.patch_hardware = min(100, game.player.quests.patch_hardware + 40)
         print("Vous avez assemblé la machine quantique !"
         "Une partie des bugs de l'ESIEE est désormais réparée.")
+
+    @staticmethod
+    def cheat_assemble(game, _cmd, _params):
+        """CHEAT : Place le joueur immédiatement après l'assemblage de la machine."""
+        print("[CHEAT] Activation du cheat machine assemblée...")
+        
+        # Placer le joueur à la Junior Entreprise
+        game.player.current_room = game.rooms.get('junior')
+        
+        # Donner la machine au joueur
+        machine = game.items.get('machine_quantique')
+        if machine:
+            game.player.inventory.items['machine_quantique'] = machine
+        
+        # Marquer la machine comme assemblée
+        game.player.quests.quests['machine_assembled'] = 'completed'
+        
+        # Augmenter le patch hardware
+        game.player.quests.patch_hardware = min(100, game.player.quests.patch_hardware + 40)
+        
+        print("Machine assemblée ! Vous êtes à la Junior Entreprise avec la machine quantique.")
+        print()
+        
+        # Déclencher la quête du patch Python sans inputs interactifs
+        game.player.quests.quests["patch_python_quest"] = "started"
+        print(
+            "\n🤖 Courivaud (voix grave) : Je reviens du futur avec mauvaises nouvelles..."
+        )
+        print(
+            "Les bugs que nous avons partiellement réparés reviennent en force!"
+        )
+        print(
+            "Il y a un patch critique à déployer en Python dans le Super-Planning,"
+        )
+        print("mais... je n'ai pas tes compétences en développement.")
+        print()
+        print(
+            "Je connais un étudiant talentueux à la Junior Entreprise"
+        )
+        print(
+            "qui pourrait le faire. Va le voir et convaints-le de t'aider."
+        )
+
+    # ======================
+    # ÉTUDIANT JUNIOR
+    # ======================
+
+    @staticmethod
+    def _talk_etudiant_junior(game):
+        """Gère l'interaction avec l'étudiant Junior et la quête du patch."""
+        # Vérifier si on a la quête du patch
+        if not game.player.quests.quests.get("patch_python_quest") == "started":
+            print("Étudiant Junior : Yo, c'est quoi ton problème?")
+            return
+
+        # Vérifier si le joueur a déjà perdu/gagné contre l'étudiant
+        if game.player.quests.quests.get("etudiant_junior_beat"):
+            print("Étudiant Junior : GG c'était tight comme match!")
+            print("Je suis en train de finaliser le déploiement du patch...")
+            print("Le Super-Planning devrait se normaliser dans quelques instants.")
+            print()
+            print("🤖 Courivaud : EXCELLENT TRAVAIL!")
+            print("Le patch a été déployé avec succès!")
+            print("Les bugs de l'ESIEE sont enfin réparés!")
+            print()
+            print("🏆 === FIN DU JEU === 🏆")
+            print("Vous avez sauvé l'ESIEE du chaos multivers!")
+            game.running = False
+            return
+
+        # Proposer de jouer à Fortnite
+        print("\nÉtudiant Junior : Tu veux que je fasse le patch pour toi?")
+        print("D'accord, mais faut d'abord que tu me prouves que t'as les skills...")
+        print("On joue une partie de Fortnite, et si tu me bats, je le fais!")
+        print()
+
+        choice = input("Acceptes-tu de jouer à Fortnite? (oui/non): ").strip().lower()
+
+        if choice not in ["oui", "o", "yes", "y"]:
+            print("Étudiant Junior : Courageux, pas vrai? 😏")
+            return
+
+        # Jouer à Fortnite
+        won = play_fortnite_minigame()
+
+        if won:
+            print("\n🎉 Étudiant Junior : Wow! T'es vraiment fort!")
+            print("J'avoue, t'as le level pour que je te fasse confiance.")
+            print("Je vais déployer le patch Python dans le Super-Planning.")
+            game.player.quests.quests["etudiant_junior_beat"] = True
+            game.player.quests.quests["patch_python_quest"] = "completed"
+            game.player.quests.patch_social = min(100, game.player.quests.patch_social + 30)
+            print("\n✅ Patch Social : progression ++ !")
+            print()
+            print("🤖 Courivaud : EXCELLENT TRAVAIL!")
+            print("Le patch a été déployé avec succès!")
+            print("Les bugs de l'ESIEE sont enfin réparés!")
+            print()
+            print("🏆 === FIN DU JEU === 🏆")
+            print("Vous avez sauvé l'ESIEE du chaos multivers!")
+            game.running = False
+        else:
+            print("\n💀 Étudiant Junior : Rip frère...")
+            print("Je vois que t'as du mal avec les jeux rapides.")
+            print("Peut-être que tu ferais mieux de développer, haha!")
+            print("Reviens si tu veux réessayer!")
+
+    @staticmethod
+    def play_fortnite(game, _cmd, _params):
+        """Lance une partie de Fortnite avec l'étudiant Junior."""
+        room = game.player.current_room
+        if "etudiant_junior" not in room.pnj:
+            print("Vous devez être avec l'étudiant Junior de la Junior Entreprise.")
+            return
+
+        if not game.player.quests.quests.get("patch_python_quest") == "started":
+            print("Il n'y a pas de raison pour vous de jouer à Fortnite ici.")
+            return
+
+        if game.player.quests.quests.get("etudiant_junior_beat"):
+            print("Vous avez déjà vaincu l'étudiant junior!")
+            return
+
+        won = play_fortnite_minigame()
+
+        if won:
+            print("\n🎉 Étudiant Junior : Wow! T'es vraiment fort!")
+            print("J'avoue, t'as le level pour que je te fasse confiance.")
+            print("Je vais déployer le patch Python dans le Super-Planning.")
+            game.player.quests.quests["etudiant_junior_beat"] = True
+            game.player.quests.quests["patch_python_quest"] = "completed"
+            game.player.quests.patch_social = min(100, game.player.quests.patch_social + 30)
+            print("\n✅ Patch Social : progression ++ !")
+            print()
+            print("🤖 Courivaud : EXCELLENT TRAVAIL!")
+            print("Le patch a été déployé avec succès!")
+            print("Les bugs de l'ESIEE sont enfin réparés!")
+            print()
+            print("🏆 === FIN DU JEU === 🏆")
+            print("Vous avez sauvé l'ESIEE du chaos multivers!")
+            game.running = False
+        else:
+            print("\n💀 Étudiant Junior : Rip frère...")
+            print("Je vois que t'as du mal avec les jeux rapides.")
+            print("Peut-être que tu ferais mieux de développer, haha!")
+            print("Reviens si tu veux réessayer!")

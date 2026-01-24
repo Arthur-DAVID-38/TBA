@@ -58,7 +58,7 @@ rooms_config = {
             "rue": "rue",
         },
         "items": ["cle_usb_bug"],
-        "pnj": ["consultant_multivers"],
+        "pnj": ["consultant_multivers", "etudiant_junior"],
     },
     "salle_blanche": {
         "name": "Salle Blanche",
@@ -292,6 +292,15 @@ pnj_config = {
         [
             "'Nouvelle recette : pâtes quantiques aux "
             "fractales comestibles.'"
+        ],
+    ),
+    "etudiant_junior": Character(
+        "etudiant_junior",
+        "développeur talentueux qui aime Fortnite.",
+        [
+            "'Yo, t'es venu me chercher une débutant?'",
+            "'Si tu me bats à Fortnite, je peux t\'aider.'",
+            "'Les commits sont comme les victoires Royale: il faut terminer strong.'",
         ],
     ),
 }

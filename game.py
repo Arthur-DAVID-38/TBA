@@ -71,6 +71,14 @@ class Game:
                 "assembler la machine (dans la salle blanche)",
                 Actions.assemble, 0),
             "inv": Command("inventory", "afficher l'inventaire", Actions.inventory, 0),
+            "cheat_assemble": Command(
+                "cheat_assemble",
+                "[CHEAT] Aller directement au moment où la machine est assemblée",
+                Actions.cheat_assemble, 0),
+            "fortnite": Command(
+                "fortnite",
+                "jouer une partie de Fortnite",
+                Actions.play_fortnite, 0),
 
         }
 
