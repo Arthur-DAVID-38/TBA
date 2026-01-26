@@ -1,8 +1,10 @@
-"""Définit l’ensemble des actions possibles du joueur
-dans le jeu TBA."""
+"""Définit l'ensemble des actions possibles du joueur dans le jeu TBA."""
+
+import random
 
 from config import DEBUG
 from fortnite_game import play_fortnite_minigame
+
 
 class Actions:
     """Regroupe les actions exécutables par le joueur."""
@@ -39,58 +41,66 @@ class Actions:
         Actions.look(game, None, None)
 
     @staticmethod
+    @staticmethod
     def look(game, _cmd, _params):
         """Affiche la description de la salle courante."""
-        import random
-        
         room = game.player.current_room
-        items = room.items
-        pnj = list(room.pnj)  # Convertir en liste pour pouvoir la modifier
-        
-        items_str = ""
-        if items:
-            lines = []
-            for i in items:
-                if i in game.items:
-                    lines.append(f"- {game.items[i]}")
-                else:
-                    lines.append(f"- (inconnu: {i})")
-            items_str = "\n".join(lines)
-
-        pnj_str = ""
-        # Ajouter les PNJs de la salle courante
-        if pnj:
-            lines = []
-            for p in pnj:
-                if p in game.pnj:
-                    # 15% de chance que le PNJ glitche à une salle adjacente
-                    glitch_chance = random.random()
-                    if glitch_chance < 0.15 and room.exits:
-                        lines.append(f"- {game.pnj[p]} (glitché dans la salle à côté?)")
-                    else:
-                        lines.append(f"- {game.pnj[p]}")
-                else:
-                    lines.append(f"- (inconnu: {p})")
-            pnj_str = "\n".join(lines)
-        
-        # Ajouter les PNJs glitchés des salles adjacentes
-        if room.exits:
-            glitched_pnjs = []
-            for adjacent_room_key in room.exits.values():
-                adjacent_room = game.rooms.get(adjacent_room_key)
-                if adjacent_room and adjacent_room.pnj:
-                    for p in adjacent_room.pnj:
-                        # 10% de chance qu'un PNJ adjacent glitche ici
-                        if random.random() < 0.10 and p in game.pnj:
-                            glitched_pnjs.append(f"- {game.pnj[p]} (glitché ici par erreur!)")
-            
-            if glitched_pnjs:
-                if pnj_str:
-                    pnj_str += "\n" + "\n".join(glitched_pnjs)
-                else:
-                    pnj_str = "\n".join(glitched_pnjs)
-
+        items_str = Actions._format_items(game, room)
+        pnj_str = Actions._format_pnjs(game, room)
         print(room.get_long_description(items_str, pnj_str))
+
+    @staticmethod
+    def _format_items(game, room):
+        """Formate la liste des objets de la salle."""
+        if not room.items:
+            return ""
+        lines = []
+        for i in room.items:
+            if i in game.items:
+                lines.append(f"- {game.items[i]}")
+            else:
+                lines.append(f"- (inconnu: {i})")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _format_pnjs(game, room):
+        """Formate la liste des PNJs de la salle."""
+        pnj_lines = Actions._format_room_pnjs(game, room)
+        glitched_lines = Actions._get_glitched_pnjs(game, room)
+        result = "\n".join(pnj_lines) if pnj_lines else ""
+        if glitched_lines:
+            result += "\n" + "\n".join(glitched_lines) if result else "\n".join(glitched_lines)
+        return result
+
+    @staticmethod
+    def _format_room_pnjs(game, room):
+        """Formate les PNJs présents dans la salle."""
+        lines = []
+        for p in room.pnj:
+            if p in game.pnj:
+                glitch_chance = random.random()
+                if glitch_chance < 0.15 and room.exits:
+                    lines.append(f"- {game.pnj[p]} (glitché?)")
+                else:
+                    lines.append(f"- {game.pnj[p]}")
+            else:
+                lines.append(f"- (inconnu: {p})")
+        return lines
+
+    @staticmethod
+    def _get_glitched_pnjs(game, room):
+        """Récupère les PNJs glitchés des salles adjacentes."""
+        if not room.exits:
+            return []
+        glitched = []
+        for adj_key in room.exits.values():
+            adj_room = game.rooms.get(adj_key)
+            if adj_room and adj_room.pnj:
+                for p in adj_room.pnj:
+                    if random.random() < 0.10 and p in game.pnj:
+                        msg = f"- {game.pnj[p]} (glitché!)"
+                        glitched.append(msg)
+        return glitched
 
     @staticmethod
     def go(game, _cmd, _params):
@@ -147,7 +157,8 @@ class Actions:
             game.player.stats.popularite -= 2
 
         if item_name in ["gants_antisurvol", "rapport_bugge"]:
-            game.player.quests.patch_hardware = min(100, game.player.quests.patch_hardware + 25)
+            game.player.quests.patch_hardware = min(
+                100, game.player.quests.patch_hardware + 25)
             print("Patch Hardware : progression ++ !")
 
     @staticmethod
@@ -429,23 +440,13 @@ class Actions:
             and not game.player.quests.quests.get("patch_python_quest")
         ):
             game.player.quests.quests["patch_python_quest"] = "started"
-            print(
-                "\n🤖 Courivaud (voix grave) : Je reviens du futur avec mauvaises nouvelles..."
-            )
-            print(
-                "Les bugs que nous avons partiellement réparés reviennent en force!"
-            )
-            print(
-                "Il y a un patch critique à déployer en Python dans le Super-Planning,"
-            )
-            print("mais... je n'ai pas tes compétences en développement.")
+            print("\n🤖 Courivaud : Je reviens du futur...")
+            print("Les bugs reviennent en force!")
+            print("Il y a un patch critique à déployer en Python")
+            print("mais... je n'ai pas tes compétences.")
             print()
-            print(
-                "Je connais un étudiant talentueux à la Junior Entreprise"
-            )
-            print(
-                "qui pourrait le faire. Va le voir et convaints-le de t'aider."
-            )
+            print("Je connais un étudiant talentueux à la Junior")
+            print("qui pourrait l'aider. Va le voir!")
             return
 
         # Si la quête du patch est complétée
@@ -468,13 +469,13 @@ class Actions:
             game.player.quests.quests["piece_bde_obtained"] = False
 
             print(
-                "Courivaud : J'ai besoin que tu récupères "
-                "trois pièces pour assembler une machine qui réparera partiellement nos bugs."
+                "Courivaud : J'ai besoin de trois pièces"
             )
+            print("pour assembler une machine qui réparera les bugs.")
             print(
-                "Va chercher une pièce à AssistEtud, une à la Salle 3142, "
-                "et une au BDE. Reviens me voir quand tu les as toutes."
+                "Va chercher une pièce à AssistEtud, une à la Salle 3142,"
             )
+            print("et une au BDE. Reviens quand tu les as toutes.")
             return
 
         # Si le joueur a déjà les 3 pièces
@@ -541,7 +542,8 @@ class Actions:
         needed = ['piece_assistetud', 'piece_salle_3142', 'piece_bde']
         missing = [p for p in needed if p not in game.player.inventory.items]
         if missing:
-            print(f"Il vous manque des pièces pour assembler la machine : {', '.join(missing)}")
+            missing_str = ', '.join(missing)
+            print(f"Il vous manque des pièces : {missing_str}")
             return
 
         # Consommer les pièces
@@ -553,51 +555,45 @@ class Actions:
         if machine:
             game.player.inventory.items['machine_quantique'] = machine
         game.player.quests.quests['machine_assembled'] = 'completed'
-        game.player.quests.patch_hardware = min(100, game.player.quests.patch_hardware + 40)
-        print("Vous avez assemblé la machine quantique !"
-        "Une partie des bugs de l'ESIEE est désormais réparée.")
+        patch_val = min(100, game.player.quests.patch_hardware + 40)
+        game.player.quests.patch_hardware = patch_val
+        print("Vous avez assemblé la machine quantique !")
+        print("Une partie des bugs de l'ESIEE est désormais réparée.")
 
     @staticmethod
     def cheat_assemble(game, _cmd, _params):
-        """CHEAT : Place le joueur immédiatement après l'assemblage de la machine."""
+        """CHEAT : Place le joueur après assemblage de la machine."""
         print("[CHEAT] Activation du cheat machine assemblée...")
-        
+
         # Placer le joueur à la Junior Entreprise
         game.player.current_room = game.rooms.get('junior')
-        
+
         # Donner la machine au joueur
         machine = game.items.get('machine_quantique')
         if machine:
             game.player.inventory.items['machine_quantique'] = machine
-        
+
         # Marquer la machine comme assemblée
         game.player.quests.quests['machine_assembled'] = 'completed'
-        
+
         # Augmenter le patch hardware
-        game.player.quests.patch_hardware = min(100, game.player.quests.patch_hardware + 40)
-        
-        print("Machine assemblée ! Vous êtes à la Junior Entreprise avec la machine quantique.")
+        patch_val = min(100, game.player.quests.patch_hardware + 40)
+        game.player.quests.patch_hardware = patch_val
+
+        print("Machine assemblée ! Vous êtes à la Junior Entreprise.")
+        print("Vous avez la machine quantique avec vous.")
         print()
-        
-        # Déclencher la quête du patch Python sans inputs interactifs
+
+        # Déclencher la quête du patch Python
         game.player.quests.quests["patch_python_quest"] = "started"
-        print(
-            "\n🤖 Courivaud (voix grave) : Je reviens du futur avec mauvaises nouvelles..."
-        )
-        print(
-            "Les bugs que nous avons partiellement réparés reviennent en force!"
-        )
-        print(
-            "Il y a un patch critique à déployer en Python dans le Super-Planning,"
-        )
-        print("mais... je n'ai pas tes compétences en développement.")
+        msg = "\n🤖 Courivaud : Je reviens du futur..."
+        print(msg)
+        print("Les bugs reviennent en force!")
+        print("Il y a un patch critique à déployer en Python")
+        print("mais... je n'ai pas tes compétences.")
         print()
-        print(
-            "Je connais un étudiant talentueux à la Junior Entreprise"
-        )
-        print(
-            "qui pourrait le faire. Va le voir et convaints-le de t'aider."
-        )
+        print("Je connais un étudiant talentueux à la Junior")
+        print("qui pourrait l'aider. Va le voir!")
 
     # ======================
     # ÉTUDIANT JUNIOR

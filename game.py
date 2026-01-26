@@ -83,10 +83,11 @@ class Game:
         }
 
     def parse(self, line):
-        """Analyse la commande saisie par l’utilisateur.
+        """Analyse la commande saisie par l'utilisateur.
+
         Vérifie la validité de la commande et retourne son nom,
         ainsi que la liste des paramètres associés.
-    """
+        """
         if not line:
             return None, []
 
@@ -116,7 +117,3 @@ class Game:
                 action = self.commands[cmd_name].action
                 action(self, cmd_name, params)
 
-
-if __name__ == "__main__":
-    game = Game()
-    game.main_loop()

@@ -1,14 +1,18 @@
+"""Définit la classe Room pour les salles du jeu TBA."""
+
+
 class Room:
     """Lieu de la map, avec descriptions, sorties, objets, et PNJ."""
 
-    def __init__(self, name, description, exits=None, items=None, pnj=None, locked=False, key_name=None):
+    # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def __init__(self, name, description, exits=None, items=None, pnj=None,
+                 locked=False, key_name=None):
         self.name = name
         self.description = description
-        self.exits = exits or {}      # {"nord": "rue", "est": "bde"}
-        self.items = items or []       # ["cafe", "cle_usb"]
-        self.pnj = pnj or []           # ["affiche_bug", "membre_bde"]
+        self.exits = exits or {}
+        self.items = items or []
+        self.pnj = pnj or []
 
-        # Verrouillage optionnel de la salle (si True, nécessite la clé 'key_name')
         self.locked = locked
         self.key_name = key_name
 
