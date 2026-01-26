@@ -238,7 +238,7 @@ class Actions:
         game.player.stats.popularite += 3
 
         # Si le conflit n'est pas encore résolu, proposer les choix conciliateurs
-        if not game.player.quests.get("bde_conflict"):
+        if not game.player.quests.quests.get("bde_conflict"):
             choices, good_answers = Actions._bde_choices(name)
 
             print("Choisissez une réponse :")
@@ -248,12 +248,12 @@ class Actions:
             reply = input("> ").strip()
 
             # Marquer qu'on a parlé (indépendamment du contenu)
-            game.player.talked_to.add(name)
+            game.player.quests.talked_to.add(name)
 
             # Si la réponse est conciliatrice, marquer ce membre comme résolu
             resolved_key = f"resolved_{name}"
             if reply in good_answers:
-                game.player.quests[resolved_key] = "ok"
+                game.player.quests.quests[resolved_key] = "ok"
                 print("Votre réponse aide à apaiser les tensions.")
             else:
                 print("Votre réponse ne convainc pas ce membre. Il reste méfiant.")
@@ -263,8 +263,8 @@ class Actions:
 
         # Si la quête de Courivaud est active, proposer le mini-jeu pour la pièce
         elif (
-            game.player.quests.get("courivaud_machine") == "started"
-            and not game.player.quests.get("piece_bde_obtained")
+            game.player.quests.quests.get("courivaud_machine") == "started"
+            and not game.player.quests.quests.get("piece_bde_obtained")
         ):
             Actions._bde_piece_minigame(game)
 
@@ -296,15 +296,15 @@ class Actions:
 
         resolved_set = {
             k
-            for k, v in game.player.quests.items()
+            for k, v in game.player.quests.quests.items()
             if k.startswith("resolved_") and v == "ok"
         }
 
         if (
             {"resolved_bde_alpha", "resolved_bde_omega"}.issubset(resolved_set)
-            and not game.player.quests.get("bde_conflict")
+            and not game.player.quests.quests.get("bde_conflict")
         ):
-            game.player.quests["bde_conflict"] = "completed"
+            game.player.quests.quests["bde_conflict"] = "completed"
 
             key_name = "cle_bureau_courivaud"
             item = game.items.get(key_name)
@@ -344,7 +344,7 @@ class Actions:
                 print(
                     "La pièce du BDE a été déposée dans la salle (inventaire plein)."
                 )
-            game.player.quests["piece_bde_obtained"] = True
+            game.player.quests.quests["piece_bde_obtained"] = True
         else:
             print(
                 "Mauvaise réponse, les membres du BDE gardent la pièce pour l'instant."
@@ -365,8 +365,8 @@ class Actions:
 
         # Mini-jeu pour la pièce AssistEtud
         if (
-            game.player.quests.get("courivaud_machine") == "started"
-            and not game.player.quests.get("piece_assistetud_obtained")
+            game.player.quests.quests.get("courivaud_machine") == "started"
+            and not game.player.quests.quests.get("piece_assistetud_obtained")
         ):
             print(
                 "L'agent vous propose un petit calcul "
@@ -385,7 +385,7 @@ class Actions:
                         "La pièce d'AssistEtud a été déposée "
                         "dans la salle (inventaire plein)."
                     )
-                game.player.quests["piece_assistetud_obtained"] = True
+                game.player.quests.quests["piece_assistetud_obtained"] = True
             else:
                 print("Mauvaise réponse, l'agent ne vous remet pas la pièce.")
 
@@ -399,8 +399,8 @@ class Actions:
         room = game.player.current_room
 
         if (
-            game.player.quests.get("courivaud_machine") == "started"
-            and not game.player.quests.get("piece_salle_3142_obtained")
+            game.player.quests.quests.get("courivaud_machine") == "started"
+            and not game.player.quests.quests.get("piece_salle_3142_obtained")
         ):
             print(
                 "Ton Double exige une preuve que vous connaissez sa salle : "
@@ -419,7 +419,7 @@ class Actions:
                         "La pièce de la salle 3142 a été déposée dans la salle "
                         "(inventaire plein)."
                     )
-                game.player.quests["piece_salle_3142_obtained"] = True
+                game.player.quests.quests["piece_salle_3142_obtained"] = True
             else:
                 print("Mauvaise réponse, Ton Double vous ignore.")
 
